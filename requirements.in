@@ -1,0 +1,10 @@
+nltk
+markdown2
+click
+simplejson
+docutils
+bs4
+daiquiri
+pygments
+progressbar2
+anymarkup

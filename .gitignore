@@ -1,0 +1,5 @@
+f8a_tagger/__pycache__/
+f8a_tagger/parsers/__pycache__/
+*.pyc
+venv/
+venv-coala/

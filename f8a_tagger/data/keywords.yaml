@@ -1,0 +1,121 @@
+---
+machine-learning:
+  synonyms:
+   - ml
+   - machine-learn
+  regexp:
+django:
+  regexp:
+   - '.*django.*'
+url:
+  synonyms:
+   - urls
+python:
+functional-programming:
+utilities:
+  synonyms:
+   - utility
+flask:
+wsgi:
+web-framework:
+werkzeug:
+jinja:
+ansible:
+  regexp:
+   - '.*ansible.*'
+git:
+aws:
+  regexp:
+   - cloudformation"
+api:
+  regexp:
+pytest:
+mock:
+oauth:
+provider:
+emoji:
+nlp:
+nltk:
+text-processing:
+testing:
+dataset:
+cache:
+statistics:
+data-science:
+json:
+mysql:
+selenium:
+java:
+ruby:
+cython:
+twitter:
+networking:
+http:
+monitoring:
+cpu:
+memory:
+memory-analysis:
+freebsd:
+osx:
+windows:
+netbsd:
+openbsd:
+linux:
+disk:
+sensors:
+system-monitoring:
+celery:
+task-queue:
+administration:
+rabbitmq:
+redis:
+asynchronous:
+bot:
+chatbot:
+framework:
+msgpack:
+numpy:
+backport:
+compatibility:
+monotonic:
+clock:
+machine-learning:
+deep-learning:
+artificial-intelligence:
+ai:
+spacy:
+debugger:
+nosql:
+database:
+documentdb:
+javascript:
+visualization:
+plotting:
+sqlite:
+postgresql:
+security:
+news:
+crawler:
+  synonyms:
+   - scraper
+   - crawling
+tensorflow:
+theano:
+ssl:
+linter:
+yaml:
+graphene:
+graphql:
+scikit-learn:
+email:
+terminal:
+  synonyms:
+   - consol
+gui:
+parallel:
+cli:
+rest:
+  synonyms:
+   - swagger
+   - openapi
+synchronous:
