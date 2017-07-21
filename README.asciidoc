@@ -1,1 +1,70 @@
-Still WIP
+fabric8-analytics-tagger
+========================
+
+Keyword extractor and tagger for fabric8-analytics.
+
+== Installation
+
+=== Containerized installation
+
+To run extractor in container, just run prepared docker-compose:
+
+```sh
+$ docker-compose build && docker-compose up
+```
+
+=== Installation using pip
+
+```sh
+$ python3 setup.py install  # or make install
+```
+
+=== Development environment
+
+```sh
+$ make devenv
+```
+
+```sh
+$ make check
+```
+
+== Usage
+
+```sh
+$ f8a_tagger_cli.py --help
+```
+
+```sh
+$ f8a_tagger_cli.py -vvv lookup /path/to/tree/or/file
+```
+
+== Configuration files and databases
+
+=== keywords.yaml
+
+```yaml
+django:
+  regexp:
+    - '.*django.*'
+```
+
+```yaml
+networking:
+  synonyms:
+    - ip
+    - ipv4
+    - ipv6
+```
+
+=== plain_stopwords.txt
+
+```
+would
+```
+
+=== regexp_stopwords.txt
+
+```
+[0-9]*
+```
