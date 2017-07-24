@@ -60,6 +60,7 @@ def progressbarize(iterable, progress=False):
     :param progress: True if print progressbar
     """
     if progress:
+        # The casting to list is due to possibly yielded value that prevents ProgressBar to compute overall ETA
         return progressbar.ProgressBar(widgets=[
             progressbar.Timer(), ', ',
             progressbar.Percentage(), ', ',
