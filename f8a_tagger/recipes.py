@@ -36,14 +36,14 @@ def lookup(path, keywords_file=None, raw_stopwords_file=None, regexp_stopwords_f
     # pylint: disable=too-many-arguments
     """Perform keywords lookup.
 
-    :param path:
-    :param keywords_file:
-    :param raw_stopwords_file:
-    :param regexp_stopwords_file:
-    :param ignore_errors:
-    :param ngram_size:
-    :param use_progressbar:
-    :return:
+    :param path: path of directory tree or file on which the lookup should be done
+    :param keywords_file: keywords file to be used
+    :param raw_stopwords_file: stopwords file to be used
+    :param regexp_stopwords_file: file with regexp stopwords to be used
+    :param ignore_errors: True, if errors should be reported but computation shouldn't be stopped
+    :param ngram_size: size of ngrams
+    :param use_progressbar: True if progressbar should be shown
+    :return: found keywords, reported per file
     """
     ret = {}
 
@@ -89,18 +89,28 @@ def collect(collector=None, ignore_errors=False, use_progressbar=False):
                 continue
             raise
 
-    return list(keywords)
+    return dict.fromkeys(list(keywords))
 
 
-def aggregate(input_keywords_file=None, output_keywords_file=None, no_synonyms=None):
+def aggregate(input_keywords_file=None, no_synonyms=None):
     """Aggregate available topics.
 
     :param input_keywords_file:
-    :param output_keywords_file:
     :param no_synonyms:
     :return:
     """
-    pass
+    all_keywords = {}
+
+    for input_file in (input_keywords_file or []):
+        input = anymarkup.parse_file(input_file)
+        for keyword, value in input:
+            if keyword in all_keywords.keys():
+                for conf, items in value.items():
+                    all_keywords[conf] = list(set(items or []) | set(all_keywords[conf] or []))
+            else:
+                all_keywords[keyword] = value
+
+    return all_keywords
 
 
 def get_registered_collectors():
