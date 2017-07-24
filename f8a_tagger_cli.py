@@ -6,15 +6,10 @@ import sys
 
 import click
 
-# Do not confuse pylint with naming
 # pylint: disable=no-name-in-module
 import daiquiri
-from f8a_tagger.keywords_chief import KeywordsChief
-from f8a_tagger.parsers import CoreParser
-from f8a_tagger.tokenizer import Tokenizer
-from f8a_tagger.utils import iter_files
 from f8a_tagger.utils import json_dumps
-import progressbar
+from f8a_tagger import aggregate, lookup, collect, get_registered_collectors
 
 _logger = daiquiri.getLogger(__name__)
 
@@ -42,40 +37,35 @@ def cli(verbose=0):
 @click.option('--ignore-errors', is_flag=True,
               help='Ignore errors, but report them.')
 @click.option('--ngram-size', default=1, help='Ngram size - e.g. 2 for bigrams.')
-def lookup(path, keywords_file=None, raw_stopwords_file=None, regexp_stopwords_file=None,
-           ignore_errors=False, ngram_size=1):
-    # pylint: disable=too-many-arguments
+def cli_lookup(path, **kwargs):
     """Perform keywords lookup."""
-    ret = {}
-
-    progress = progressbar.ProgressBar(widgets=[
-        progressbar.Timer(), ', ',
-        progressbar.Percentage(), ', ',
-        progressbar.SimpleProgress(), ', ',
-        progressbar.ETA()
-    ])
-
-    chief = KeywordsChief(keywords_file)
-    if chief.compute_ngram_size() > ngram_size:
-        _logger.warning("Computed ngram size (%d) does not reflect supplied ngram size (%d), "
-                        "some synonyms will be omitted", chief.compute_ngram_size(), ngram_size)
-
-    for file in progress(list(iter_files(path, ignore_errors))):
-        _logger.info("Processing file '%s'", file)
-        try:
-            content = CoreParser().parse_file(file)
-            tokens = Tokenizer(raw_stopwords_file, regexp_stopwords_file, ngram_size).tokenize(content)
-            keywords = chief.extract_keywords(tokens)
-        except Exception as exc:  # pylint: disable=broad-except
-            if not ignore_errors:
-                raise
-            _logger.exception("Failed to parse content in file '%s': %s", file, str(exc))
-            continue
-
-        ret[file] = keywords
-
+    ret = lookup(path, use_progressbar=True, **kwargs)
     print(json_dumps(ret))
 
+
+@cli.command('collect')
+@click.option('-c', '--collector', type=click.Choice(get_registered_collectors()), multiple=True,
+              help='Resource collector to use, if none selected all collectors will be run.')
+@click.option('--ignore-errors', is_flag=True,
+              help='Ignore errors, but report them.')
+def cli_collect(**kwargs):
+    """Collect keywords from external resources."""
+    ret = collect(use_progressbar=True, **kwargs)
+    print(json_dumps(ret))
+
+
+@cli.command('aggregate')
+@click.option('-i', '--input-keywords-file',
+              help="Input keywords files to use.")
+@click.option('-o', '--output-keywords-file',
+              help="Output keywords file with aggregated topics.")
+@click.option('--no-synonyms',
+              help="Do not compute synonyms.")
+def cli_aggregate(**kwargs):
+    """Aggregate keywords to a single file."""
+    print(kwargs)
+    ret = aggregate(**kwargs)
+    print(json_dumps(ret))
 
 if __name__ == '__main__':
     sys.exit(cli())

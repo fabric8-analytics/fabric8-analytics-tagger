@@ -10,3 +10,4 @@ __copyright__ = 'Copyright 2017 Fridolin Pokorny'
 from .corpus import Corpus
 from .keywords_chief import KeywordsChief
 from .tokenizer import Tokenizer
+from .recipes import aggregate, lookup, collect, get_registered_collectors
