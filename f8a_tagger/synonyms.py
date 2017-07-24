@@ -10,9 +10,22 @@ def compute_synonyms(keyword):
     """
     synonyms = set()
 
-    synonyms = synonyms.union(' '.join(keyword.split('-')))
-    synonyms = synonyms.union(' '.join(keyword.split('.')))
-    synonyms = synonyms.union('-'.join(keyword.split('.')))
-    synonyms = synonyms.union('.'.join(keyword.split('-')))
+    words = str(keyword).split('-')
+    if len(words) > 1:
+        synonyms.add(' '.join(words))
+        synonyms.add('.'.join(words))
+        synonyms.add('_'.join(words))
 
-    return list(synonyms) or None
+    words = str(keyword).split('.')
+    if len(words) > 1:
+        synonyms.add(' '.join(words))
+        synonyms.add('-'.join(words))
+        synonyms.add('_'.join(words))
+
+    words = str(keyword).split('_')
+    if len(words) > 1:
+        synonyms.add(' '.join(words))
+        synonyms.add('-'.join(words))
+        synonyms.add('.'.join(words))
+
+    return list(synonyms) or []

@@ -69,7 +69,7 @@ def cli_collect(**kwargs):
 
 
 @cli.command('aggregate')
-@click.option('-i', '--input-keywords-file',
+@click.option('-i', '--input-keywords-file', multiple=True,
               help="Input keywords files to use.")
 @click.option('-o', '--output-keywords-file',
               help="Output keywords file with aggregated keywords.")

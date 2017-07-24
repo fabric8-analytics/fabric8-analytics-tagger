@@ -88,15 +88,16 @@ def aggregate(input_keywords_file=None, no_synonyms=None, use_progressbar=False)
 
     for input_file in progressbarize(input_keywords_file or [], use_progressbar):
         input_content = anymarkup.parse_file(input_file)
-        for keyword, value in input_content:
-            if keyword in all_keywords.keys():
+        for keyword, value in input_content.items():
+            if str(keyword) in all_keywords.keys() and value is not None and all_keywords[str(keyword)] is not None:
                 for conf, items in value.items():
-                    all_keywords[conf] = list(set(items or []) | set(all_keywords[conf] or []))
+                    all_keywords[str(conf)] = list(set(items or []) | set(all_keywords[str(conf)] or []))
             else:
-                all_keywords[keyword] = value
+                all_keywords[str(keyword)] = value
 
             if not no_synonyms:
-                all_keywords[keyword] = set(all_keywords[keyword]) | compute_synonyms(keyword)
+                all_keywords[str(keyword)] = list(set(all_keywords[str(keyword)] or [])
+                                                  | set(compute_synonyms(keyword)))
 
     return all_keywords
 
