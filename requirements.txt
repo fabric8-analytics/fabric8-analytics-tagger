@@ -8,10 +8,13 @@ anymarkup-core==0.7.1     # via anymarkup
 anymarkup==0.7.0
 beautifulsoup4==4.6.0     # via bs4
 bs4==0.0.1
+certifi==2017.4.17        # via requests
+chardet==3.0.4            # via requests
 click==6.7
 configobj==5.0.6          # via anymarkup
 daiquiri==1.2.0
 docutils==0.13.1
+idna==2.5                 # via requests
 json5==0.2.4              # via anymarkup
 markdown2==2.3.4
 nltk==3.2.4
@@ -19,7 +22,9 @@ progressbar2==3.30.2
 pygments==2.2.0
 python-utils==2.1.0       # via progressbar2
 pyyaml==3.12              # via anymarkup
+requests==2.18.1
 simplejson==3.11.1
 six==1.10.0               # via anymarkup-core, configobj, nltk, python-utils
 toml==0.9.2               # via anymarkup
+urllib3==1.21.1           # via requests
 xmltodict==0.11.0         # via anymarkup
