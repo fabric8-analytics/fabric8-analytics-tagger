@@ -1,4 +1,4 @@
 [Default]
 bears = PEP8Bear,BanditBear,PyImportSortBear
-files = *.py,f8a_tagger/*.py,f8a_tagger/parsers/*.py
+files = *.py,f8a_tagger/*.py,f8a_tagger/parsers/*.py,f8a_tagger/collectors/*.py
 max_line_length = 121

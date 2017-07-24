@@ -7,10 +7,13 @@ import sys
 import click
 
 # pylint: disable=no-name-in-module
-import daiquiri
 import anymarkup
+import daiquiri
+from f8a_tagger import aggregate
+from f8a_tagger import collect
+from f8a_tagger import get_registered_collectors
+from f8a_tagger import lookup
 from f8a_tagger.utils import json_dumps
-from f8a_tagger import aggregate, lookup, collect, get_registered_collectors
 
 _logger = daiquiri.getLogger(__name__)
 

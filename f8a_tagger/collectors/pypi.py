@@ -2,12 +2,12 @@
 """PyPI keywords collector."""
 
 import requests
-from bs4 import BeautifulSoup
 
+from bs4 import BeautifulSoup
 import daiquiri
+from f8a_tagger.utils import progressbarize
 
 from .base import CollectorBase
-from f8a_tagger.utils import progressbarize
 
 _logger = daiquiri.getLogger(__name__)
 
@@ -49,13 +49,14 @@ class PypiCollector(CollectorBase):
 
             # some packages have comma hardcoded in the keywords list, split keywords there as well
             found_keywords = []
-            for kw in meta_keywords[0].get('content', '').split(' '):
-                found_keywords += [k.lower() for k in kw.split(',')]
+            for word in meta_keywords[0].get('content', '').split(' '):
+                found_keywords += [k.lower() for k in word.split(',')]
 
             _logger.debug("Found keywords %s in '%s'", found_keywords, package_name)
             if found_keywords:
                 keywords = keywords.union(set(found_keywords))
 
         return list(keywords)
+
 
 CollectorBase.register_collector('PyPI', PypiCollector)

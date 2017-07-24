@@ -2,14 +2,15 @@
 """Keywords extraction/tagging for fabric8-analytics."""
 
 # pylint: disable=no-name-in-module
+import anymarkup
 import daiquiri
+from f8a_tagger.collectors import CollectorBase
 from f8a_tagger.keywords_chief import KeywordsChief
 from f8a_tagger.parsers import CoreParser
-from f8a_tagger.tokenizer import Tokenizer
-from f8a_tagger.utils import iter_files, progressbarize
-from f8a_tagger.collectors import CollectorBase
 from f8a_tagger.synonyms import compute_synonyms
-import anymarkup
+from f8a_tagger.tokenizer import Tokenizer
+from f8a_tagger.utils import iter_files
+from f8a_tagger.utils import progressbarize
 
 _logger = daiquiri.getLogger(__name__)
 
@@ -62,7 +63,7 @@ def collect(collector=None, ignore_errors=False, use_progressbar=False):
     """
     keywords = set()
 
-    for col in (collector or CollectorBase.get_registered_collectors()):
+    for col in (collector or CollectorBase.get_registered_collectors()):  # pylint: disable=superfluous-parens
         try:
             collector_instance = CollectorBase.get_collector_class(col)()
             keywords = keywords.union(set(collector_instance.execute(ignore_errors, use_progressbar)))
@@ -86,8 +87,8 @@ def aggregate(input_keywords_file=None, no_synonyms=None, use_progressbar=False)
     all_keywords = {}
 
     for input_file in progressbarize(input_keywords_file or [], use_progressbar):
-        input = anymarkup.parse_file(input_file)
-        for keyword, value in input:
+        input_content = anymarkup.parse_file(input_file)
+        for keyword, value in input_content:
             if keyword in all_keywords.keys():
                 for conf, items in value.items():
                     all_keywords[conf] = list(set(items or []) | set(all_keywords[conf] or []))

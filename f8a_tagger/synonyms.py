@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Synonyms manipulation for the given keyword."""
 
 
 def compute_synonyms(keyword):

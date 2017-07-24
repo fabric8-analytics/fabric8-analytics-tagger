@@ -4,9 +4,9 @@
 from collections import deque
 import json
 import os
-import progressbar
 
 import daiquiri
+import progressbar
 
 _logger = daiquiri.getLogger(__name__)
 
