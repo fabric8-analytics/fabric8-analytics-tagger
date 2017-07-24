@@ -3,6 +3,35 @@ fabric8-analytics-tagger
 
 Keyword extractor and tagger for fabric8-analytics.
 
+== Usage
+
+For getting all available commands issue:
+
+```sh
+$ f8a_tagger_cli.py --help
+
+Usage: f8a_tagger_cli.py [OPTIONS] COMMAND [ARGS]...
+
+  Set up core CLI options.
+
+Options:
+  -v, --verbose  Level of verbosity, can be applied multiple times.
+  --help         Show this message and exit.
+
+Commands:
+  aggregate  Aggregate keywords to a single file.
+  collect    Collect keywords from external resources.
+  lookup     Perform keywords lookup.
+```
+
+Currently, there are available three commands as shown above: aggregate, collect, lookup.
+
+To run a command in verbose mode (adds additional messages), run:
+
+```sh
+$ f8a_tagger_cli.py -vvvv lookup /path/to/tree/or/file
+```
+
 == Installation
 
 === Containerized installation
@@ -21,33 +50,70 @@ $ python3 setup.py install  # or make install
 
 === Development environment
 
+If you would like to set up a virtualenv for your environment, just issue prepared `make venv` Make target:
 ```sh
-$ make devenv
+$ make venv
 ```
+
+After this command, there should be available virtual environment that can be accessed using:
+
+```sh
+$ source venv/bin/activate
+```
+
+And exited using:
+
+```sh
+$ deactivate
+```
+
+To run checks, issue `make check` command:
 
 ```sh
 $ make check
 ```
 
-== Usage
+There is run a set of linters provided by link:https://coala.io/[Coala]; there is also run `pylint`, `pydocstyle`. To execute only desired linter, run appropriate Make target:
 
 ```sh
-$ f8a_tagger_cli.py --help
+$ make coala
+$ make pylint
+$ make pydocstyle
 ```
 
-```sh
-$ f8a_tagger_cli.py -vvv lookup /path/to/tree/or/file
-```
-
-== Configuration files and databases
+== Configuration files
 
 === keywords.yaml
+
+File `keywords.yaml` keeps all keywords that are in a form of:
+
+```yaml
+keyword:
+  synonyms:
+    - list
+    - of
+    - synonyms
+  regexp:
+    - 'list.*'
+    - 'o{1}f{1}'
+    - 'regular[ _-]expressions?'
+```
+
+TCollectors are set of classeso summarize it - a keyword is a key to dictionary containing additional fields:
+
+ * synonyms - for list of synonyms to the given keyword
+ * regexp - for list of regular expressions that match the given keyword
+
+
+For example, if you would like to define keyword `django` that matches all words that contain "`django`", just define:
 
 ```yaml
 django:
   regexp:
     - '.*django.*'
 ```
+
+Another example demonstrates synonyms. To define synonyms IP, IPv4 and IPv6 as synonyms to networking, just define the following entry:
 
 ```yaml
 networking:
@@ -57,14 +123,54 @@ networking:
     - ipv6
 ```
 
+Regular expressions conforms to link:https://docs.python.org/3/library/re.html[Python regular expressions].
+
 === plain_stopwords.txt
+
+This file contains all stopwords (words that should be left out from text analysis) in raw/plaintext format. All stopwords are listed one per line.
+
+An example of stopwords file keeping stopwords ("would", "should" and "are"):
 
 ```
 would
+should
+are
 ```
 
 === regexp_stopwords.txt
 
+File `regexp_stopwords.txt` consist of regular expressions that are used to filter out stopwords. Even though the regular expressions are compiled before use, use `plain_words.txt` file for defining keywords that should correspond to exact plain match for sake of performance.
+
+There is used Python regexp syntax to define regular expressions.
+
+An example of regular expression stopwords:
+
 ```
 [0-9]*
+https?://[a-zA-Z0-9.]*
 ```
+
+== Practices
+
+* all collectors should receive a set of keywords that are all lowercase
+* the only delimiter that is allowed for multi word keywords is dash (`-`), all spaces should be replaced with dash
+* synonyms for multi word keywords are automatically created in aggregate command, if requested
+
+== README.json
+
+README.json is a format introduced by one task (`GitReadmeCollectorTask`) present in fabric8-analytics-worker. The structure of document is described by one JSON file containing two keys:
+
+ * `content` - raw content of README file
+ * `type` - content type that can be markdown, ReStructuredText, ... (see `f8a_tagger.parsers.abstract` for more info)
+
+== Parsers
+
+Parsers are used to transform README.json files to plaintext files. Their main goal is to remove any markup specific annotations and provide just plaintext that can be directly used for additional text processing.
+
+You can see implementation of parsers in the `f8a_tagger/parsers` directory.
+
+== Collectors
+
+There is also present a set of collectors that collect keywords/topics/tags from various external resources such as PyPI, Maven central and such. These collectors produce a list of keywords that can be later on used for keywords extraction.
+
+All collectors are present under `f8a_tagger/collectors` package.
