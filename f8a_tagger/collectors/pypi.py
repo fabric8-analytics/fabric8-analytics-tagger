@@ -47,7 +47,11 @@ class PypiCollector(CollectorBase):
                 _logger.warning(warn_msg)
                 continue
 
-            found_keywords = meta_keywords[0].get('content', '').split(' ')
+            # some packages have comma hardcoded in the keywords list, split keywords there as well
+            found_keywords = []
+            for kw in meta_keywords[0].get('content', '').split(' '):
+                found_keywords += kw.split(',')
+
             _logger.debug("Found keywords %s in '%s'", found_keywords, package_name)
             if found_keywords:
                 keywords.union(set(found_keywords))
