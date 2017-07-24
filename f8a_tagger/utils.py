@@ -4,6 +4,7 @@
 from collections import deque
 import json
 import os
+import progressbar
 
 import daiquiri
 
@@ -50,3 +51,20 @@ def json_dumps(dictionary, pretty=True):
         }
 
     return json.dumps(dictionary, **pretty_json_kwargs)
+
+
+def progressbarize(iterable, progress=False):
+    """Construct progressbar for loops if progressbar requested, otherwise return directly iterable.
+
+    :param iterable: iterable to use
+    :param progress: True if print progressbar
+    """
+    if progress:
+        return progressbar.ProgressBar(widgets=[
+            progressbar.Timer(), ', ',
+            progressbar.Percentage(), ', ',
+            progressbar.SimpleProgress(), ', ',
+            progressbar.ETA()
+        ])(list(iterable))
+
+    return iterable

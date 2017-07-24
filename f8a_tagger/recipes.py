@@ -6,29 +6,11 @@ import daiquiri
 from f8a_tagger.keywords_chief import KeywordsChief
 from f8a_tagger.parsers import CoreParser
 from f8a_tagger.tokenizer import Tokenizer
-from f8a_tagger.utils import iter_files
+from f8a_tagger.utils import iter_files, progressbarize
 from f8a_tagger.collectors import CollectorBase
 import anymarkup
-import progressbar
 
 _logger = daiquiri.getLogger(__name__)
-
-
-def _use_progressbar(iterable, progress=False):
-    """Construct progressbar for loops if progressbar requested, otherwise return directly iterable.
-
-    :param iterable: iterable to use
-    :param progress: True if print progressbar
-    """
-    if progress:
-        return progressbar.ProgressBar(widgets=[
-            progressbar.Timer(), ', ',
-            progressbar.Percentage(), ', ',
-            progressbar.SimpleProgress(), ', ',
-            progressbar.ETA()
-        ])(list(iterable))
-
-    return iterable
 
 
 def lookup(path, keywords_file=None, raw_stopwords_file=None, regexp_stopwords_file=None,
@@ -52,7 +34,7 @@ def lookup(path, keywords_file=None, raw_stopwords_file=None, regexp_stopwords_f
         _logger.warning("Computed ngram size (%d) does not reflect supplied ngram size (%d), "
                         "some synonyms will be omitted", chief.compute_ngram_size(), ngram_size)
 
-    for file in _use_progressbar(iter_files(path, ignore_errors), progress=use_progressbar):
+    for file in progressbarize(iter_files(path, ignore_errors), progress=use_progressbar):
         _logger.info("Processing file '%s'", file)
         try:
             content = CoreParser().parse_file(file)
@@ -72,9 +54,9 @@ def lookup(path, keywords_file=None, raw_stopwords_file=None, regexp_stopwords_f
 def collect(collector=None, ignore_errors=False, use_progressbar=False):
     """Collect keywords from external resources.
 
-    :param collector:
-    :param ignore_errors:
-    :param use_progressbar:
+    :param collector: a list/tuple of collectors to be used
+    :param ignore_errors: if True, ignore all errors, but report them
+    :param use_progressbar: use progressbar if True
     :return: all collected keywords
     """
     keywords = set()
@@ -82,7 +64,7 @@ def collect(collector=None, ignore_errors=False, use_progressbar=False):
     for col in (collector or CollectorBase.get_registered_collectors()):
         try:
             collector_instance = CollectorBase.get_collector_class(col)()
-            keywords.union(set(collector_instance.execute()))
+            keywords = keywords.union(set(collector_instance.execute(ignore_errors, use_progressbar)))
         except Exception as exc:
             if ignore_errors:
                 _logger.exception("Collection of keywords for '%s' failed: %s" % (col, str(exc)))
@@ -92,16 +74,17 @@ def collect(collector=None, ignore_errors=False, use_progressbar=False):
     return dict.fromkeys(list(keywords))
 
 
-def aggregate(input_keywords_file=None, no_synonyms=None):
+def aggregate(input_keywords_file=None, no_synonyms=None, use_progressbar=False):
     """Aggregate available topics.
 
-    :param input_keywords_file:
-    :param no_synonyms:
+    :param input_keywords_file: a list/tuple of input keywords files to process
+    :param no_synonyms: do not compute synonyms for keywords
+    :param use_progressbar: use progressbar to report progress
     :return:
     """
     all_keywords = {}
 
-    for input_file in (input_keywords_file or []):
+    for input_file in progressbarize(input_keywords_file or [], use_progressbar):
         input = anymarkup.parse_file(input_file)
         for keyword, value in input:
             if keyword in all_keywords.keys():
@@ -109,6 +92,10 @@ def aggregate(input_keywords_file=None, no_synonyms=None):
                     all_keywords[conf] = list(set(items or []) | set(all_keywords[conf] or []))
             else:
                 all_keywords[keyword] = value
+
+            if not no_synonyms:
+                #all_keywords[keyword] = None
+                raise NotImplementedError()
 
     return all_keywords
 

@@ -10,7 +10,7 @@ class CollectorBase(metaclass=abc.ABCMeta):
     _collectors = {}
 
     @abc.abstractmethod
-    def execute(self, ignore_errors=True):
+    def execute(self, ignore_errors=True, use_progressbar=False):
         """Collect keywords."""
         pass
 

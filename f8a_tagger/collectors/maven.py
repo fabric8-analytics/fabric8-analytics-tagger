@@ -7,7 +7,7 @@ from .base import CollectorBase
 class MavenCollector(CollectorBase):
     """Maven keywords collector."""
 
-    def execute(self, ignore_errors=True):
+    def execute(self, ignore_errors=True, use_progressbar=False):
         """Collect Maven keywords."""
         raise NotImplementedError()
 

@@ -25,10 +25,7 @@ def _print_result(result, output_file):
 @click.group()
 @click.option('-v', '--verbose', count=True, help='Level of verbosity, can be applied multiple times.')
 def cli(verbose=0):
-    """Set up core CLI options.
-
-    :param verbose: verbose limit
-    """
+    """Set up core CLI options."""
     # hack based on num values of logging.DEBUG, logging.INFO, ...
     level = max(logging.ERROR - verbose * 10, logging.DEBUG)
     daiquiri.setup(outputs=(daiquiri.output.STDERR,), level=level)
@@ -78,7 +75,7 @@ def cli_collect(**kwargs):
 def cli_aggregate(**kwargs):
     """Aggregate keywords to a single file."""
     output_keywords_file = kwargs.pop('output_keywords_file')
-    ret = aggregate(**kwargs)
+    ret = aggregate(use_progressbar=True, **kwargs)
     _print_result(ret, output_keywords_file)
 
 

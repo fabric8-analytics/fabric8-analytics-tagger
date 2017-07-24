@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 import daiquiri
 
 from .base import CollectorBase
+from f8a_tagger.utils import progressbarize
 
 _logger = daiquiri.getLogger(__name__)
 
@@ -17,7 +18,7 @@ class PypiCollector(CollectorBase):
     _PYPI_SIMPLE_URL = 'https://pypi.python.org/simple/'
     _PACKAGE_BASE_URL = 'https://pypi.python.org/pypi/'
 
-    def execute(self, ignore_errors=True):
+    def execute(self, ignore_errors=True, use_progressbar=False):
         """Collect PyPI keywords."""
         keywords = set()
 
@@ -28,7 +29,7 @@ class PypiCollector(CollectorBase):
                                % (self._PYPI_SIMPLE_URL, response.status_code))
 
         soup = BeautifulSoup(response.text, 'lxml')
-        for link in soup.find_all('a'):
+        for link in progressbarize(soup.find_all('a'), use_progressbar):
             package_name = link.text
             response = requests.get("{}/{}".format(self._PACKAGE_BASE_URL, package_name))
             if response.status_code != 200:
@@ -41,7 +42,6 @@ class PypiCollector(CollectorBase):
 
             package_soup = BeautifulSoup(response.text, 'lxml')
             meta_keywords = package_soup.find_all('meta', attrs={'name': 'keywords'})
-            print(len(meta_keywords))
             if len(meta_keywords) != 1:
                 warn_msg = "Failed to parse and find keywords for '%s'" % package_name
                 _logger.warning(warn_msg)
@@ -54,7 +54,7 @@ class PypiCollector(CollectorBase):
 
             _logger.debug("Found keywords %s in '%s'", found_keywords, package_name)
             if found_keywords:
-                keywords.union(set(found_keywords))
+                keywords = keywords.union(set(found_keywords))
 
         return list(keywords)
 
