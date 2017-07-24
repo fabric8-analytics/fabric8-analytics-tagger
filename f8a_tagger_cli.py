@@ -7,7 +7,7 @@ import sys
 import click
 
 # Do not confuse pylint with naming
-# pylint: disable=import-self,no-name-in-module
+# pylint: disable=no-name-in-module
 import daiquiri
 from f8a_tagger.keywords_chief import KeywordsChief
 from f8a_tagger.parsers import CoreParser
@@ -20,7 +20,7 @@ _logger = daiquiri.getLogger(__name__)
 
 
 @click.group()
-@click.option('-v', '--verbose', count=True)
+@click.option('-v', '--verbose', count=True, help='Level of verbosity, can be applied multiple times.')
 def cli(verbose=0):
     """Set up core CLI options.
 
@@ -34,14 +34,14 @@ def cli(verbose=0):
 @cli.command('lookup')
 @click.argument('path', type=click.Path(exists=True, file_okay=True, dir_okay=True))
 @click.option('--keywords-file', type=click.Path(exists=True, file_okay=True, dir_okay=False),
-              help='Path to keywords file')
+              help='Path to keywords file.')
 @click.option('--raw-stopwords-file', type=click.Path(exists=True, file_okay=True, dir_okay=False),
-              help='Path to raw stopwords file')
+              help='Path to raw stopwords file.')
 @click.option('--regexp-stopwords-file', type=click.Path(exists=True, file_okay=True, dir_okay=False),
-              help='Path to regexp stopwords file')
+              help='Path to regexp stopwords file.')
 @click.option('--ignore-errors', is_flag=True,
-              help='Ignore errors, but report them')
-@click.option('--ngram-size', default=1, help='Ngram size')
+              help='Ignore errors, but report them.')
+@click.option('--ngram-size', default=1, help='Ngram size - e.g. 2 for bigrams.')
 def lookup(path, keywords_file=None, raw_stopwords_file=None, regexp_stopwords_file=None,
            ignore_errors=False, ngram_size=1):
     # pylint: disable=too-many-arguments
