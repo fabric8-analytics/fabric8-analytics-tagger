@@ -49,6 +49,7 @@ def cli(verbose=0):
 @click.option('--ngram-size', default=1, help='Ngram size - e.g. 2 for bigrams.')
 def cli_lookup(path, **kwargs):
     """Perform keywords lookup."""
+    # TODO: stemming
     output_file = kwargs.pop('output_file')
     ret = lookup(path, use_progressbar=True, **kwargs)
     _print_result(ret, output_file)
