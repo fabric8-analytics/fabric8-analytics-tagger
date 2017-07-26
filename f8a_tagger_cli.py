@@ -5,6 +5,7 @@ import logging
 import sys
 
 import click
+import yaml
 
 # pylint: disable=no-name-in-module
 import anymarkup
@@ -21,7 +22,12 @@ _logger = daiquiri.getLogger(__name__)
 
 def _print_result(result, output_file, fmt=None):
     if not output_file or output_file == '-':
-        print(json_dumps(result))
+        if fmt == 'yaml' or fmt == 'yml':
+            print(yaml.dump(result))
+        elif fmt == 'json' or fmt is None:
+            print(json_dumps(result))
+        else:
+            raise ValueError("Unknown output format '%s'" % fmt)
     else:
         if fmt is None:  # try to guess format by file extension
             extension = output_file.split('.')[-1]
