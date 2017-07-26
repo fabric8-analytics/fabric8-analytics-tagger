@@ -19,14 +19,14 @@ from f8a_tagger.utils import json_dumps
 _logger = daiquiri.getLogger(__name__)
 
 
-def _print_result(result, output_file):
+def _print_result(result, output_file, fmt=None):
     if not output_file or output_file == '-':
         print(json_dumps(result))
     else:
-        extension = output_file.split('.')[-1]
-        fmt = None
-        if extension in ('yaml', 'yml', 'json'):
-            fmt = extension if extension != 'yml' else 'yaml'
+        if fmt is None:  # try to guess format by file extension
+            extension = output_file.split('.')[-1]
+            if extension in ('yaml', 'yml', 'json'):
+                fmt = extension if extension != 'yml' else 'yaml'
         _logger.debug("Serializing output to file '%s'", output_file)
         anymarkup.serialize_file(result, output_file, format=fmt)
 
@@ -50,13 +50,16 @@ def cli(verbose=0):
               help='Path to stopwords file.')
 @click.option('--ignore-errors', is_flag=True,
               help='Ignore errors, but report them.')
+@click.option('-f', '--output-format',
+              help='Output keywords format/type.')
 @click.option('--ngram-size', default=1, help='Ngram size - e.g. 2 for bigrams.')
 def cli_lookup(path, **kwargs):
     """Perform keywords lookup."""
     # TODO: stemming
     output_file = kwargs.pop('output_file')
+    output_format = kwargs.pop('output_format')
     ret = lookup(path, use_progressbar=True, **kwargs)
-    _print_result(ret, output_file)
+    _print_result(ret, output_file, output_format)
 
 
 @cli.command('collect')
@@ -64,13 +67,16 @@ def cli_lookup(path, **kwargs):
               help='Resource collector to use, if none selected all collectors will be run.')
 @click.option('-o', '--output-keywords-file',
               help='Output keywords file with keywords.')
+@click.option('-f', '--output-format',
+              help='Output keywords format/type.')
 @click.option('--ignore-errors', is_flag=True,
               help='Ignore errors, but report them.')
 def cli_collect(**kwargs):
     """Collect keywords from external resources."""
     output_keywords_file = kwargs.pop('output_keywords_file')
+    output_format = kwargs.pop('output_format')
     ret = collect(use_progressbar=True, **kwargs)
-    _print_result(ret, output_keywords_file)
+    _print_result(ret, output_keywords_file, output_format)
 
 
 @cli.command('aggregate')
@@ -78,13 +84,16 @@ def cli_collect(**kwargs):
               help="Input keywords files to use.")
 @click.option('-o', '--output-keywords-file',
               help='Output keywords file with aggregated keywords.')
+@click.option('-f', '--output-format',
+              help='Output keywords file format/type.')
 @click.option('--no-synonyms',
               help="Do not compute synonyms.")
 def cli_aggregate(**kwargs):
     """Aggregate keywords to a single file."""
     output_keywords_file = kwargs.pop('output_keywords_file')
+    output_format = kwargs.pop('output_format')
     ret = aggregate(use_progressbar=True, **kwargs)
-    _print_result(ret, output_keywords_file)
+    _print_result(ret, output_keywords_file, output_format)
 
 
 @cli.command('diff')
@@ -133,11 +142,14 @@ def cli_diff(keywords1_file_path, keywords2_file_path, synonyms_only=False, keyw
 @click.argument('path', type=click.Path(exists=True, file_okay=True, dir_okay=True))
 @click.option('-o', '--output-keywords-file',
               help='Output keywords file with aggregated keywords.')
+@click.option('-f', '--output-format',
+              help='Output keywords file format/type.')
 def cli_tf_idf(path, **kwargs):
     """Compute TF-IDF on the given corpus given by directory structure."""
     output_keywords_file = kwargs.pop('output_keywords_file')
+    output_format = kwargs.pop('output_format')
     result = tf_idf(path, **kwargs)
-    _print_result(result, output_keywords_file)
+    _print_result(result, output_keywords_file, output_format)
 
 
 if __name__ == '__main__':
