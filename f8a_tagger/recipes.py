@@ -15,15 +15,14 @@ from f8a_tagger.utils import progressbarize
 _logger = daiquiri.getLogger(__name__)
 
 
-def lookup(path, keywords_file=None, raw_stopwords_file=None, regexp_stopwords_file=None,
+def lookup(path, keywords_file=None, stopwords_file=None,
            ignore_errors=False, ngram_size=2, use_progressbar=False):
     # pylint: disable=too-many-arguments
     """Perform keywords lookup.
 
     :param path: path of directory tree or file on which the lookup should be done
     :param keywords_file: keywords file to be used
-    :param raw_stopwords_file: stopwords file to be used
-    :param regexp_stopwords_file: file with regexp stopwords to be used
+    :param stopwords_file: stopwords file to be used
     :param ignore_errors: True, if errors should be reported but computation shouldn't be stopped
     :param ngram_size: size of ngrams
     :param use_progressbar: True if progressbar should be shown
@@ -40,7 +39,7 @@ def lookup(path, keywords_file=None, raw_stopwords_file=None, regexp_stopwords_f
         _logger.info("Processing file '%s'", file)
         try:
             content = CoreParser().parse_file(file)
-            tokens = Tokenizer(raw_stopwords_file, regexp_stopwords_file, ngram_size).tokenize(content)
+            tokens = Tokenizer(stopwords_file, ngram_size).tokenize(content)
             keywords = chief.extract_keywords(tokens)
         except Exception as exc:  # pylint: disable=broad-except
             if not ignore_errors:

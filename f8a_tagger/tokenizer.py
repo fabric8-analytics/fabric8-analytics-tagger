@@ -14,10 +14,9 @@ _logger = daiquiri.getLogger(__name__)
 class Tokenizer(object):
     """Tokenizer for fabric8-analytics."""
 
-    _RAW_STOPWORDS_TXT = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data', 'plain_stopwords.txt')
-    _REGEXP_STOPWORDS_TXT = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data', 'regexp_stopwords.txt')
+    _STOPWORDS_TXT = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data', 'stopwords.txt')
 
-    def __init__(self, raw_stopwords=None, regexp_stopwords=None, ngram_size=1):
+    def __init__(self, stopwords_file=None, ngram_size=1):
         """Construct.
 
         :param raw_stopwords: path to raw stopwords file
@@ -30,16 +29,24 @@ class Tokenizer(object):
         self._ngram_size = ngram_size
         _logger.debug('ngram size is %d', self._ngram_size)
 
-        with open(raw_stopwords or self._RAW_STOPWORDS_TXT, 'r') as f:
-            self._raw_stopwords = [stopword for stopword in f.read().split('\n')
-                                   if not stopword.startswith('#') and stopword != '#']
+        self._regexp_stopwords = []
+        self._raw_stopwords = []
+
+        with open(stopwords_file or self._STOPWORDS_TXT, 'r') as f:
+            for word in f.read().split('\n'):
+                # Remove comments
+                if word.startswith('#') and word != '#':
+                    continue
+
+                if word.startswith('re: '):
+                    self._regexp_stopwords.append(re.compile(word[len('re: '):]))
+                else:
+                    if word.startswith('re:'):
+                        _logger.warning("Stopword listed in '%s' starts with 're:' but treating as raw "
+                                        "stopword, missing space after?")
+                    self._raw_stopwords.append(word)
 
         _logger.debug('Registered raw stopwords: %s', self._raw_stopwords)
-
-        with open(regexp_stopwords or self._REGEXP_STOPWORDS_TXT, 'r') as f:
-            self._regexp_stopwords = [re.compile(regexp) for regexp in f.read().split('\n')
-                                      if not regexp.startswith('#')]
-
         _logger.debug('Registered regexp stopwords: %s', [regexp.pattern for regexp in self._regexp_stopwords])
 
     def remove_stopwords(self, tokens):

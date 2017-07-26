@@ -31,4 +31,4 @@ def compute_synonyms(keyword):
         synonyms.add('.'.join(words))
         synonyms.add(''.join(words))
 
-    return list(synonyms) or []
+    return list(synonyms)

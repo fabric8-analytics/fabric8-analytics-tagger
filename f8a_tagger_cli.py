@@ -37,13 +37,11 @@ def cli(verbose=0):
 @cli.command('lookup')
 @click.argument('path', type=click.Path(exists=True, file_okay=True, dir_okay=True))
 @click.option('-o', '--output-file',
-              help="Output file with found keywords.")
+              help='Output file with found keywords.')
 @click.option('--keywords-file', type=click.Path(exists=True, file_okay=True, dir_okay=False),
               help='Path to keywords file.')
-@click.option('--raw-stopwords-file', type=click.Path(exists=True, file_okay=True, dir_okay=False),
-              help='Path to raw stopwords file.')
-@click.option('--regexp-stopwords-file', type=click.Path(exists=True, file_okay=True, dir_okay=False),
-              help='Path to regexp stopwords file.')
+@click.option('--stopwords-file', type=click.Path(exists=True, file_okay=True, dir_okay=False),
+              help='Path to stopwords file.')
 @click.option('--ignore-errors', is_flag=True,
               help='Ignore errors, but report them.')
 @click.option('--ngram-size', default=1, help='Ngram size - e.g. 2 for bigrams.')
@@ -59,7 +57,7 @@ def cli_lookup(path, **kwargs):
 @click.option('-c', '--collector', type=click.Choice(get_registered_collectors()), multiple=True,
               help='Resource collector to use, if none selected all collectors will be run.')
 @click.option('-o', '--output-keywords-file',
-              help="Output keywords file with keywords.")
+              help='Output keywords file with keywords.')
 @click.option('--ignore-errors', is_flag=True,
               help='Ignore errors, but report them.')
 def cli_collect(**kwargs):

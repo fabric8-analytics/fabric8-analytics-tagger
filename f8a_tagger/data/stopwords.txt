@@ -696,3 +696,4 @@ years
 young
 younger
 youngest
+re: [0-9.]+
