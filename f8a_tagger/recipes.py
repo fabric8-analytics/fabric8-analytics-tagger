@@ -105,6 +105,11 @@ def aggregate(input_keywords_file=None, no_synonyms=None, use_progressbar=False)
     return all_keywords
 
 
+def tf_idf(path):
+    """Compute TF-IDF on the given corpus described by directory tree."""
+    raise NotImplementedError("Computing TF-IDF is currently not supported")
+
+
 def get_registered_collectors():
     """Get all registered collectors."""
     return CollectorBase.get_registered_collectors()

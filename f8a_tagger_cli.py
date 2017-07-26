@@ -13,6 +13,7 @@ from f8a_tagger import aggregate
 from f8a_tagger import collect
 from f8a_tagger import get_registered_collectors
 from f8a_tagger import lookup
+from f8a_tagger import tf_idf
 from f8a_tagger.utils import json_dumps
 
 _logger = daiquiri.getLogger(__name__)
@@ -71,7 +72,7 @@ def cli_collect(**kwargs):
 @click.option('-i', '--input-keywords-file', multiple=True,
               help="Input keywords files to use.")
 @click.option('-o', '--output-keywords-file',
-              help="Output keywords file with aggregated keywords.")
+              help='Output keywords file with aggregated keywords.')
 @click.option('--no-synonyms',
               help="Do not compute synonyms.")
 def cli_aggregate(**kwargs):
@@ -79,6 +80,55 @@ def cli_aggregate(**kwargs):
     output_keywords_file = kwargs.pop('output_keywords_file')
     ret = aggregate(use_progressbar=True, **kwargs)
     _print_result(ret, output_keywords_file)
+
+
+@cli.command('diff')
+@click.argument('keywords1_file_path', type=click.Path(exists=True, file_okay=True, dir_okay=False))
+@click.argument('keywords2_file_path', type=click.Path(exists=True, file_okay=True, dir_okay=False))
+@click.option('-s', '--synonyms-only', default=False, is_flag=True,
+              help='Print only changes in synonyms.')
+@click.option('-k', '--keywords-only', default=False, is_flag=True,
+              help='Print only changes in keywords.')
+@click.option('-r', '--regexp-only', default=False, is_flag=True,
+              help='Print only changes in regular expressions.')
+def cli_diff(keywords1_file_path, keywords2_file_path, synonyms_only=False, keywords_only=False, regexp_only=False):
+    """Compute diff on keyword files."""
+    if synonyms_only and keywords_only:
+        raise ValueError('Cannot use --synonyms-only and --keywords-only at the same time')
+
+    keywords1 = anymarkup.parse_file(keywords1_file_path)
+    keywords2 = anymarkup.parse_file(keywords2_file_path)
+    differ = False
+
+    for action, keywords_a, keywords_b, file_path in (('Removed', keywords1, keywords2, keywords1_file_path),
+                                                      ('Added', keywords2, keywords1, keywords2_file_path)):
+        for keyword, value in keywords_a.items():
+            if not synonyms_only and not regexp_only and keyword not in keywords_b.keys():
+                print("%s keyword '%s' in file '%s'" % (action, keyword, file_path))
+                differ = True
+                continue
+
+            if not keywords_only and not regexp_only and value is not None:
+                for synonym in (value.get('synonyms') or[]):
+                    if synonym not in keywords_b[keyword].get('synonyms', []):
+                        print("%s synonym '%s' for keyword '%s' in file '%s'" % (action, synonym, keyword, file_path))
+                        differ = True
+
+            if not keywords_only and not synonyms_only and value is not None:
+                for regexp in (value.get('regexp') or []):
+                    if regexp not in keywords_b[keyword].get('regexp', []):
+                        print("%s regexp '%s' for keyword '%s' in file '%s'" % (action, regexp, keyword, file_path))
+                        differ = True
+
+    if not differ:
+        print("Files '%s' and '%s' do not differ" % (keywords1_file_path, keywords2_file_path))
+
+
+@cli.command('tf-idf')
+@click.argument('path', type=click.Path(exists=True, file_okay=True, dir_okay=True))
+def cli_tf_idf(path, **kwargs):
+    """Compute TF-IDF on the given corpus given by directory structure."""
+    tf_idf(path, **kwargs)
 
 
 if __name__ == '__main__':
