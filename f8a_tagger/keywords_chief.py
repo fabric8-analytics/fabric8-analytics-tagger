@@ -39,7 +39,7 @@ class KeywordsChief(object):
         for entry in self._keywords.values():
             if entry and entry.get('synonyms'):
                 for synonym in entry['synonyms']:
-                    ngram_size = max(len(synonym.split(' ')), ngram_size)
+                    ngram_size = max(len(str(synonym).split(' ')), ngram_size)
 
         return ngram_size
 

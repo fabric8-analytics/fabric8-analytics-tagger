@@ -96,8 +96,12 @@ def aggregate(input_keywords_file=None, no_synonyms=None, use_progressbar=False)
                 all_keywords[str(keyword)] = value
 
             if not no_synonyms:
-                all_keywords[str(keyword)] = list(set(all_keywords[str(keyword)] or [])
-                                                  | set(compute_synonyms(keyword)))
+                synonyms = list(set(all_keywords[str(keyword)] or []) | set(compute_synonyms(keyword)))
+
+                if synonyms:
+                    if all_keywords[str(keyword)] is None:
+                        all_keywords[str(keyword)] = {}
+                    all_keywords[str(keyword)]['synonyms'] = synonyms
 
     return all_keywords
 
