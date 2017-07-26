@@ -75,7 +75,7 @@ def collect(collector=None, ignore_errors=False, use_progressbar=False):
     return dict.fromkeys(list(keywords))
 
 
-def aggregate(input_keywords_file=None, no_synonyms=None, use_progressbar=False):
+def aggregate(input_keywords_file, no_synonyms=None, use_progressbar=False):
     """Aggregate available topics.
 
     :param input_keywords_file: a list/tuple of input keywords files to process
@@ -83,8 +83,10 @@ def aggregate(input_keywords_file=None, no_synonyms=None, use_progressbar=False)
     :param use_progressbar: use progressbar to report progress
     :return:
     """
-    all_keywords = {}
+    if not input_keywords_file:
+        raise ValueError('No input keywords files provided')
 
+    all_keywords = {}
     for input_file in progressbarize(input_keywords_file or [], use_progressbar):
         input_content = anymarkup.parse_file(input_file)
         for keyword, value in input_content.items():
