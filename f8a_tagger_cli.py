@@ -34,7 +34,7 @@ def _print_result(result, output_file):
 @click.group()
 @click.option('-v', '--verbose', count=True, help='Level of verbosity, can be applied multiple times.')
 def cli(verbose=0):
-    """Set up core CLI options."""
+    """Tagger for fabric8-analytics."""
     # hack based on num values of logging.DEBUG, logging.INFO, ...
     level = max(logging.ERROR - verbose * 10, logging.DEBUG)
     daiquiri.setup(outputs=(daiquiri.output.STDERR,), level=level)
