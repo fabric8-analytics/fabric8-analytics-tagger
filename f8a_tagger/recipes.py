@@ -7,7 +7,6 @@ import daiquiri
 from f8a_tagger.collectors import CollectorBase
 from f8a_tagger.keywords_chief import KeywordsChief
 from f8a_tagger.parsers import CoreParser
-from f8a_tagger.synonyms import compute_synonyms
 from f8a_tagger.tokenizer import Tokenizer
 from f8a_tagger.utils import iter_files
 from f8a_tagger.utils import progressbarize
@@ -97,7 +96,7 @@ def aggregate(input_keywords_file, no_synonyms=None, use_progressbar=False):
                 all_keywords[str(keyword)] = value
 
             if not no_synonyms:
-                synonyms = list(set(all_keywords[str(keyword)] or []) | set(compute_synonyms(keyword)))
+                synonyms = list(set(all_keywords[str(keyword)] or []) | set(KeywordsChief.compute_synonyms(keyword)))
 
                 if synonyms:
                     if all_keywords[str(keyword)] is None:
