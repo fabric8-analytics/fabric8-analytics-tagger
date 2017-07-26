@@ -15,17 +15,20 @@ def compute_synonyms(keyword):
         synonyms.add(' '.join(words))
         synonyms.add('.'.join(words))
         synonyms.add('_'.join(words))
+        synonyms.add(''.join(words))
 
     words = str(keyword).split('.')
     if len(words) > 1:
         synonyms.add(' '.join(words))
         synonyms.add('-'.join(words))
         synonyms.add('_'.join(words))
+        synonyms.add(''.join(words))
 
     words = str(keyword).split('_')
     if len(words) > 1:
         synonyms.add(' '.join(words))
         synonyms.add('-'.join(words))
         synonyms.add('.'.join(words))
+        synonyms.add(''.join(words))
 
     return list(synonyms) or []
