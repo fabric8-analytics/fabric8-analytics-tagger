@@ -107,6 +107,7 @@ def cli_aggregate(**kwargs):
               help='Print only changes in regular expressions.')
 def cli_diff(keywords1_file_path, keywords2_file_path, synonyms_only=False, keywords_only=False, regexp_only=False):
     """Compute diff on keyword files."""
+    # pylint: disable=too-many-locals
     if synonyms_only and keywords_only:
         raise ValueError('Cannot use --synonyms-only and --keywords-only at the same time')
 
@@ -123,13 +124,13 @@ def cli_diff(keywords1_file_path, keywords2_file_path, synonyms_only=False, keyw
                 continue
 
             if not keywords_only and not regexp_only and value is not None:
-                for synonym in (value.get('synonyms') or[]):
+                for synonym in (value.get('synonyms') or[]):  # pylint: disable=superfluous-parens
                     if synonym not in keywords_b[keyword].get('synonyms', []):
                         print("%s synonym '%s' for keyword '%s' in file '%s'" % (action, synonym, keyword, file_path))
                         differ = True
 
             if not keywords_only and not synonyms_only and value is not None:
-                for regexp in (value.get('regexp') or []):
+                for regexp in (value.get('regexp') or []):  # pylint: disable=superfluous-parens
                     if regexp not in keywords_b[keyword].get('regexp', []):
                         print("%s regexp '%s' for keyword '%s' in file '%s'" % (action, regexp, keyword, file_path))
                         differ = True

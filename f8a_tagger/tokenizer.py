@@ -19,10 +19,8 @@ class Tokenizer(object):
     def __init__(self, stopwords_file=None, ngram_size=1):
         """Construct.
 
-        :param raw_stopwords: path to raw stopwords file
-        :type raw_stopwords: str
-        :param regexp_stopwords: path to regexp stopwords file
-        :type regexp_stopwords: str
+        :param stopwords_file: path to stopwords file
+        :type stopwords_file: str
         :param ngram_size: size of ngrams that should be constructed from tokens
         :type ngram_size: int
         """
