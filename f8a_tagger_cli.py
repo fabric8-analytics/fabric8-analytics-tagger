@@ -23,7 +23,12 @@ def _print_result(result, output_file):
     if not output_file or output_file == '-':
         print(json_dumps(result))
     else:
-        anymarkup.serialize_file(result, output_file)
+        extension = output_file.split('.')[-1]
+        fmt = None
+        if extension in ('yaml', 'yml', 'json'):
+            fmt = extension if extension != 'yml' else 'yaml'
+        _logger.debug("Serializing output to file '%s'", output_file)
+        anymarkup.serialize_file(result, output_file, format=fmt)
 
 
 @click.group()
@@ -126,9 +131,13 @@ def cli_diff(keywords1_file_path, keywords2_file_path, synonyms_only=False, keyw
 
 @cli.command('tf-idf')
 @click.argument('path', type=click.Path(exists=True, file_okay=True, dir_okay=True))
+@click.option('-o', '--output-keywords-file',
+              help='Output keywords file with aggregated keywords.')
 def cli_tf_idf(path, **kwargs):
     """Compute TF-IDF on the given corpus given by directory structure."""
-    tf_idf(path, **kwargs)
+    output_keywords_file = kwargs.pop('output_keywords_file')
+    result = tf_idf(path, **kwargs)
+    _print_result(result, output_keywords_file)
 
 
 if __name__ == '__main__':
