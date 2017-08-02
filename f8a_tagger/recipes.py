@@ -6,6 +6,7 @@ import anymarkup
 import daiquiri
 from f8a_tagger.collectors import CollectorBase
 from f8a_tagger.keywords_chief import KeywordsChief
+from f8a_tagger.keywords_set import KeywordsSet
 from f8a_tagger.parsers import CoreParser
 from f8a_tagger.tokenizer import Tokenizer
 from f8a_tagger.utils import iter_files
@@ -59,19 +60,18 @@ def collect(collector=None, ignore_errors=False, use_progressbar=False):
     :param use_progressbar: use progressbar if True
     :return: all collected keywords
     """
-    keywords = set()
-
+    keywords_set = KeywordsSet()
     for col in (collector or CollectorBase.get_registered_collectors()):  # pylint: disable=superfluous-parens
         try:
             collector_instance = CollectorBase.get_collector_class(col)()
-            keywords = keywords.union(set(collector_instance.execute(ignore_errors, use_progressbar)))
+            keywords_set.union(collector_instance.execute(ignore_errors, use_progressbar))
         except Exception as exc:
             if ignore_errors:
                 _logger.exception("Collection of keywords for '%s' failed: %s" % (col, str(exc)))
                 continue
             raise
 
-    return dict.fromkeys(list(keywords))
+    return keywords_set.keywords
 
 
 def aggregate(input_keywords_file, no_synonyms=None, use_progressbar=False):
@@ -89,14 +89,19 @@ def aggregate(input_keywords_file, no_synonyms=None, use_progressbar=False):
     for input_file in progressbarize(input_keywords_file or [], use_progressbar):
         input_content = anymarkup.parse_file(input_file)
         for keyword, value in input_content.items():
-            if str(keyword) in all_keywords.keys() and value is not None and all_keywords[str(keyword)] is not None:
+            keyword = str(keyword)
+            if keyword in all_keywords.keys() and value is not None and all_keywords[keyword] is not None:
+                all_keywords[keyword]['occurrence_count'] = value.pop('occurrence_count', 0) +\
+                                                            all_keywords[keyword].get('occurrence_count', 0)
                 for conf, items in value.items():
-                    all_keywords[str(conf)] = list(set(items or []) | set(all_keywords[str(conf)] or []))
+                    all_keywords[keyword][str(conf)] = list(
+                        set(items or []) | set(all_keywords[keyword][str(conf)] or []))
             else:
-                all_keywords[str(keyword)] = value
+                all_keywords[keyword] = value
 
             if not no_synonyms:
-                synonyms = list(set(all_keywords[str(keyword)] or []) | set(KeywordsChief.compute_synonyms(keyword)))
+                synonyms = list(set(all_keywords[keyword].get('synonyms') or []) |
+                                set(KeywordsChief.compute_synonyms(keyword)))
 
                 if synonyms:
                     if all_keywords[str(keyword)] is None:

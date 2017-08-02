@@ -11,7 +11,13 @@ class CollectorBase(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def execute(self, ignore_errors=True, use_progressbar=False):
-        """Collect keywords."""
+        """Collect keywords.
+
+        :param ignore_errors: ignore any non-critical error
+        :param use_progressbar: report progress with progressbar
+        :return: keywords set
+        :rtype: f8a_tagger.keywords_set.KeywordsSet
+        """
         pass
 
     @classmethod

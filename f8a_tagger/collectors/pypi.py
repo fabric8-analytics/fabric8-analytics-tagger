@@ -5,6 +5,7 @@ import requests
 
 from bs4 import BeautifulSoup
 import daiquiri
+from f8a_tagger.keywords_set import KeywordsSet
 from f8a_tagger.utils import progressbarize
 
 from .base import CollectorBase
@@ -20,7 +21,7 @@ class PypiCollector(CollectorBase):
 
     def execute(self, ignore_errors=True, use_progressbar=False):
         """Collect PyPI keywords."""
-        keywords = set()
+        keywords_set = KeywordsSet()
 
         _logger.debug("Fetching PyPI")
         response = requests.get(self._PYPI_SIMPLE_URL)
@@ -53,10 +54,10 @@ class PypiCollector(CollectorBase):
                 found_keywords += [k.lower() for k in word.split(',')]
 
             _logger.debug("Found keywords %s in '%s'", found_keywords, package_name)
-            if found_keywords:
-                keywords = keywords.union(set(found_keywords))
+            for keyword in set(found_keywords):
+                keywords_set.add(keyword)
 
-        return list(keywords)
+        return keywords_set
 
 
 CollectorBase.register_collector('PyPI', PypiCollector)
