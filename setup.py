@@ -5,6 +5,7 @@ import sys
 
 from setuptools import find_packages
 from setuptools import setup
+from setuptools.command.install import install
 
 NAME = 'f8a_tagger'
 
@@ -16,6 +17,17 @@ def get_requirements():
 
 if sys.version_info[0] != 3:
     sys.exit("Python3 is required in order to install f8a_tagger")
+
+
+class CustomInstallCommand(install):
+    """Ensure that NLTK get initialized after tagger installation."""
+    def run(self):
+        def _post_install():
+            import nltk
+            nltk.download("punkt")
+        install.run(self)
+        self.execute(_post_install, [], msg="preparing NLTK")
+
 
 setup(
     name=NAME,
@@ -36,6 +48,9 @@ setup(
     url='https://github.com/fabric8-analytics/fabric8-analytics-tagger',
     license='ASL 2.0',
     keywords='tags topics keywords',
+    cmdclass={
+        'install': CustomInstallCommand,
+    },
     classifiers=[
         "Development Status :: 4 - Beta",
         "Programming Language :: Python :: 3",

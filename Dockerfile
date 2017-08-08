@@ -14,8 +14,7 @@ RUN yum install -y epel-release &&\
   pushd /tmp/kw_install &&\
   pip3 install . &&\
   popd &&\
-  rm -rf /tmp/kw_install &&\
-  python3 -c 'import nltk; nltk.download("punkt");'
+  rm -rf /tmp/kw_install
 
 COPY hack/run_tagger.sh /usr/bin/
 
