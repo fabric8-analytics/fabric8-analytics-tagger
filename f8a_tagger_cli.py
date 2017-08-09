@@ -63,7 +63,8 @@ def cli(verbose=0):
               help='Stemmer type to be used.')
 @click.option('--lemmatize', is_flag=True,
               help='Use lemmatizer.')
-@click.option('--ngram-size', default=1, help='Ngram size - e.g. 2 for bigrams.')
+@click.option('--ngram-size', default=None, help='Ngram size - e.g. 2 for bigrams, if not provided, '
+                                                 'ngram size is computed based on keywords.yaml file.', type=int)
 def cli_lookup(path, **kwargs):
     """Perform keywords lookup."""
     # TODO: stemming
