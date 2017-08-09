@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """Tokenizer for fabric8-analytics tagger."""
 
+import io
 import os
 import re
 
 import nltk
 
 import daiquiri
+from f8a_tagger.errors import InvalidInputError
 
 _logger = daiquiri.getLogger(__name__)
 
@@ -19,7 +21,7 @@ class Tokenizer(object):
     def __init__(self, stopwords_file=None, ngram_size=1, lemmatizer=None, stemmer=None):
         """Construct.
 
-        :param stopwords_file: path to stopwords file
+        :param stopwords_file: path to stopwords file or file
         :type stopwords_file: str
         :param ngram_size: size of ngrams that should be constructed from tokens
         :type ngram_size: int
@@ -34,19 +36,27 @@ class Tokenizer(object):
         self._stemmer = stemmer
         self._lemmatizer = lemmatizer
 
-        with open(stopwords_file or self._STOPWORDS_TXT, 'r') as f:
-            for word in f.read().split('\n'):
-                # Remove comments
-                if word.startswith('#') and word != '#':
-                    continue
+        if isinstance(stopwords_file, str) or stopwords_file is None:
+            with open(stopwords_file or self._STOPWORDS_TXT, 'r') as f:
+                content = f.read()
+        elif isinstance(stopwords_file, io.TextIOBase):
+            content = stopwords_file.read()
+        else:
+            raise InvalidInputError("Invalid stopword file provided '%s' (type %s)"
+                                    % (stopwords_file, type(stopwords_file)))
 
-                if word.startswith('re: '):
-                    self._regexp_stopwords.append(re.compile(word[len('re: '):]))
-                else:
-                    if word.startswith('re:'):
-                        _logger.warning("Stopword listed in '%s' starts with 're:' but treating as raw "
-                                        "stopword, missing space after?")
-                    self._raw_stopwords.append(word)
+        for word in content.split('\n'):
+            # Remove comments
+            if word.startswith('#') and word != '#':
+                continue
+
+            if word.startswith('re: '):
+                self._regexp_stopwords.append(re.compile(word[len('re: '):]))
+            else:
+                if word.startswith('re:'):
+                    _logger.warning("Stopword listed in '%s' starts with 're:' but treating as raw "
+                                    "stopword, missing space after?")
+                self._raw_stopwords.append(word)
 
         _logger.debug('Registered raw stopwords without lemmatization and stemming: %s', self._raw_stopwords)
 

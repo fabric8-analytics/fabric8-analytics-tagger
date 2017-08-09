@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """Keywords loading and handling for fabric8-analytics."""
 
+import io
 import os
 import re
 
 import anymarkup
 import daiquiri
+from f8a_tagger.errors import InvalidInputError
 
 _logger = daiquiri.getLogger(__name__)
 
@@ -15,19 +17,28 @@ class KeywordsChief(object):
 
     _DEFAULT_KEYWORD_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data', 'keywords.yaml')
 
-    def __init__(self, keyword_file_path=None, lemmatizer=False, stemmer=None):
+    def __init__(self, keyword_file=None, lemmatizer=False, stemmer=None):
         """Construct.
 
-        :param keyword_file_path: a path to keyword file
+        :param keyword_file: a path to keyword file
         :param lemmatizer: lematizer instance to be used
         :param stemmer: stemmer instance to be used
         """
         self._stemmer = stemmer
         self._lemmatizer = lemmatizer
 
-        with open(keyword_file_path or self._DEFAULT_KEYWORD_FILE_PATH, 'r') as f:
-            self._keywords = anymarkup.parse(f.read())
+        if isinstance(keyword_file, str) or keyword_file is None:
+            with open(keyword_file or self._DEFAULT_KEYWORD_FILE_PATH, 'r') as f:
+                content = f.read()
+        elif isinstance(keyword_file, io.TextIOBase):
+            content = keyword_file.read()
+        else:
+            raise InvalidInputError("Unknown keyword file provided - %s" % (type(keyword_file)))
 
+        self._keywords = anymarkup.parse(content)
+        del content
+
+        # add missing default values
         for keyword in self._keywords.keys():
             if self._keywords[keyword] is None:
                 self._keywords[keyword] = {'synonyms': [], 'regexp': []}
