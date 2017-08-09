@@ -42,7 +42,7 @@ def _print_result(result, output_file, fmt=None):
 def cli(verbose=0):
     """Tagger for fabric8-analytics."""
     # hack based on num values of logging.DEBUG, logging.INFO, ...
-    level = max(logging.ERROR - verbose * 10, logging.DEBUG)
+    level = max(logging.WARNING - verbose * 10, logging.DEBUG)
     daiquiri.setup(outputs=(daiquiri.output.STDERR,), level=level)
 
 
