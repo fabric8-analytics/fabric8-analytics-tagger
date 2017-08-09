@@ -13,6 +13,7 @@ import daiquiri
 from f8a_tagger import aggregate
 from f8a_tagger import collect
 from f8a_tagger import get_registered_collectors
+from f8a_tagger import get_registered_stemmers
 from f8a_tagger import lookup
 from f8a_tagger import tf_idf
 from f8a_tagger.utils import json_dumps
@@ -58,6 +59,10 @@ def cli(verbose=0):
               help='Ignore errors, but report them.')
 @click.option('-f', '--output-format',
               help='Output keywords format/type.')
+@click.option('--stemmer', type=click.Choice(get_registered_stemmers()), multiple=False,
+              help='Stemmer type to be used.')
+@click.option('--lemmatize', is_flag=True,
+              help='Use lemmatizer.')
 @click.option('--ngram-size', default=1, help='Ngram size - e.g. 2 for bigrams.')
 def cli_lookup(path, **kwargs):
     """Perform keywords lookup."""

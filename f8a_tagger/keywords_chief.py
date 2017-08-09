@@ -14,40 +14,48 @@ class KeywordsChief(object):
     """Keeping and interacting with keywords."""
 
     _DEFAULT_KEYWORD_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data', 'keywords.yaml')
-    _DEFAULT_BLACKLIST_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data', 'blacklist.txt')
 
-    def __init__(self, keyword_file_path=None, blacklist_file_path=None):
+    def __init__(self, keyword_file_path=None, lemmatizer=False, stemmer=None):
         """Construct.
 
         :param keyword_file_path: a path to keyword file
-        :param blacklist_file_path: a path to keyword blacklist file
+        :param lemmatizer: lematizer instance to be used
+        :param stemmer: stemmer instance to be used
         """
+        self._stemmer = stemmer
+        self._lemmatizer = lemmatizer
+
         with open(keyword_file_path or self._DEFAULT_KEYWORD_FILE_PATH, 'r') as f:
             self._keywords = anymarkup.parse(f.read())
 
-        for entry in self._keywords.values():
-            if entry and entry.get('regexp'):
-                for idx, regexp in enumerate(entry['regexp']):
-                    entry['regexp'][idx] = re.compile(regexp)
+        for keyword in self._keywords.keys():
+            if self._keywords[keyword] is None:
+                self._keywords[keyword] = {'synonyms': [], 'regexp': []}
 
-        with open(blacklist_file_path or self._DEFAULT_BLACKLIST_FILE_PATH, 'r') as f:
-            content = f.read()
+            if self._keywords[keyword].get('synonyms') is None:
+                self._keywords[keyword]['synonyms'] = []
 
-        self._regexp_blacklist = []
-        self._raw_blacklist = []
-        for word in content.split('\n'):
-            if not word:
-                continue
+            if self._keywords[keyword].get('regexp') is None:
+                self._keywords[keyword]['regexp'] = []
 
-            if word.startswith('re: '):
-                _logger.debug("Adding blacklisted keyword based on regexp '%s'", word)
-                self._regexp_blacklist.append(re.compile(word[len('re: '):]))
-            else:
-                if word.startswith('re:'):
-                    _logger.warning("Found blacklisted word '%s' that starts with 're:' but there is no space "
-                                    "after :, treating as raw blacklist word", word)
-                _logger.debug("Adding raw blacklisted keyword '%s'", word)
-                self._raw_blacklist.append(word)
+        for keyword, entry in self._keywords.items():
+            for idx, regexp in enumerate(entry['regexp']):
+                entry['regexp'][idx] = re.compile(regexp)
+
+            entry['synonyms'].append(keyword)
+
+            for idx, synonym in enumerate(entry['synonyms']):
+                for delim in [' ', '_', '-']:
+                    synonyms = synonym.split(delim)
+                    if self._lemmatizer:
+                        synonyms = [self._lemmatizer.lemmatize(t) for t in synonyms]
+                    if self._stemmer:
+                        synonyms = [self._stemmer.stem(t) for t in synonyms]
+                    new_synonym = delim.join(synonyms)
+
+                    if new_synonym != synonym:
+                        _logger.debug("Stemmed and lemmatized keyword synonym from '%s' to '%s'", synonym, new_synonym)
+                        entry['synonyms'][idx] = new_synonym
 
     def compute_ngram_size(self):
         """Compute ngram size based on keywords configuration.
@@ -189,13 +197,6 @@ class KeywordsChief(object):
         :param word: keyword to be checked
         :return: True if the given word is a keyword
         """
-        if word in self._raw_blacklist:
-            return False
-
-        for regexp in self._regexp_blacklist:
-            if re.fullmatch(regexp, word):
-                return False
-
         return self._keywords.get(word) is not None
 
     def filter_keywords(self, keywords):

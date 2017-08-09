@@ -12,6 +12,7 @@ from .keywords_chief import KeywordsChief
 from .recipes import aggregate
 from .recipes import collect
 from .recipes import get_registered_collectors
+from .recipes import get_registered_stemmers
 from .recipes import lookup
 from .recipes import tf_idf
 from .tokenizer import Tokenizer
