@@ -9,3 +9,4 @@ pygments
 progressbar2
 anymarkup
 requests
+lxml
