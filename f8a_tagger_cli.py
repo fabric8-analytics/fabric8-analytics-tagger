@@ -15,6 +15,7 @@ from f8a_tagger import collect
 from f8a_tagger import get_registered_collectors
 from f8a_tagger import get_registered_stemmers
 from f8a_tagger import lookup
+from f8a_tagger import reckon
 from f8a_tagger import tf_idf
 from f8a_tagger.utils import json_dumps
 
@@ -149,6 +150,27 @@ def cli_diff(keywords1_file_path, keywords2_file_path, synonyms_only=False, keyw
 
     if not differ:
         print("Files '%s' and '%s' do not differ" % (keywords1_file_path, keywords2_file_path))
+
+
+@cli.command('reckon')
+@click.option('-o', '--output-file',
+              help='Output file with found keywords.')
+@click.option('--keywords-file', type=click.Path(exists=True, file_okay=True, dir_okay=False),
+              help='Path to keywords file.')
+@click.option('--stopwords-file', type=click.Path(exists=True, file_okay=True, dir_okay=False),
+              help='Path to stopwords file.')
+@click.option('-f', '--output-format',
+              help='Output keywords format/type.')
+@click.option('--stemmer', type=click.Choice(get_registered_stemmers()), multiple=False,
+              help='Stemmer type to be used.')
+@click.option('--lemmatize', is_flag=True,
+              help='Use lemmatizer.')
+def cli_reckon(**kwargs):
+    """Compute keywords and stopwords based on stemmer and lemmatizer configuration."""
+    output_file = kwargs.pop('output_file')
+    output_format = kwargs.pop('output_format')
+    ret = reckon(**kwargs)
+    _print_result(ret, output_file, output_format)
 
 
 @cli.command('tf-idf')

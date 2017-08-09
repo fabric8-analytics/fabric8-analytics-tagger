@@ -68,6 +68,28 @@ class KeywordsChief(object):
                         _logger.debug("Stemmed and lemmatized keyword synonym from '%s' to '%s'", synonym, new_synonym)
                         entry['synonyms'][idx] = new_synonym
 
+    @property
+    def keywords(self):
+        """Keywords used by keywords chief instance."""
+        ret = {}
+
+        for keyword in self._keywords.keys():
+            for conf in self._keywords[keyword].keys():
+                if not self._keywords[keyword][conf]:
+                    continue
+
+                if keyword not in ret:
+                    ret[keyword] = {}
+
+                if conf == 'regexp':
+                    ret[keyword]['regexp'] = []
+                    for regexp in self._keywords[keyword]['regexp']:
+                        ret[keyword]['regexp'].append(regexp.pattern)
+                else:
+                    ret[keyword][conf] = self._keywords[keyword][conf]
+
+        return ret
+
     def compute_ngram_size(self):
         """Compute ngram size based on keywords configuration.
 

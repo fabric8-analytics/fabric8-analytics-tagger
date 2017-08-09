@@ -68,6 +68,16 @@ class Tokenizer(object):
         _logger.debug('Registered regexp stopwords: %s',
                       [regexp.pattern for regexp in self._regexp_stopwords])
 
+    @property
+    def raw_stopwords(self):
+        """Return raw stopwords maintained by tokenizer."""
+        return self._raw_stopwords
+
+    @property
+    def regexp_stopwords(self):
+        """Return regexp stopwords maintained by tokenizer."""
+        return list('re: ' + regexp.pattern for regexp in self._regexp_stopwords)
+
     def _lemmatize(self, tokens, stopwords=False):
         """Lemmatize a list of tokens.
 
