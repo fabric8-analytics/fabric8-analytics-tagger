@@ -21,10 +21,12 @@ if sys.version_info[0] != 3:
 
 class CustomInstallCommand(install):
     """Ensure that NLTK get initialized after tagger installation."""
+
     def run(self):
         def _post_install():
             import nltk
             nltk.download("punkt")
+            nltk.download("wordnet")
         install.run(self)
         self.execute(_post_install, [], msg="preparing NLTK")
 

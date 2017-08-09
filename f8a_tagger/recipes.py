@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Keywords extraction/tagging for fabric8-analytics."""
 
-# pylint: disable=no-name-in-module
 import anymarkup
 import daiquiri
 from f8a_tagger.collectors import CollectorBase
 from f8a_tagger.keywords_chief import KeywordsChief
 from f8a_tagger.keywords_set import KeywordsSet
+from f8a_tagger.lemmatizer import Lemmatizer
 from f8a_tagger.parsers import CoreParser
+from f8a_tagger.stemmer import Stemmer
 from f8a_tagger.tokenizer import Tokenizer
 from f8a_tagger.utils import iter_files
 from f8a_tagger.utils import progressbarize
@@ -16,7 +17,7 @@ _logger = daiquiri.getLogger(__name__)
 
 
 def lookup(path, keywords_file=None, stopwords_file=None,
-           ignore_errors=False, ngram_size=2, use_progressbar=False):
+           ignore_errors=False, ngram_size=2, use_progressbar=False, lemmatize=False, stemmer=None):
     # pylint: disable=too-many-arguments
     """Perform keywords lookup.
 
@@ -26,11 +27,19 @@ def lookup(path, keywords_file=None, stopwords_file=None,
     :param ignore_errors: True, if errors should be reported but computation shouldn't be stopped
     :param ngram_size: size of ngrams
     :param use_progressbar: True if progressbar should be shown
+    :param lemmatize: use lemmatizer
+    :type lemmatize: bool
+    :param stemmer: stemmer to be used
+    :type stemmer: str
     :return: found keywords, reported per file
     """
     ret = {}
 
-    chief = KeywordsChief(keywords_file)
+    stemmer_instance = Stemmer.get_stemmer(stemmer) if stemmer is not None else None
+    lemmatizer_instance = Lemmatizer.get_lemmatizer() if lemmatize else None
+    chief = KeywordsChief(keywords_file, lemmatizer=lemmatizer_instance, stemmer=stemmer_instance)
+    tokenizer = Tokenizer(stopwords_file, ngram_size, lemmatizer=lemmatizer_instance, stemmer=stemmer_instance)
+
     if chief.compute_ngram_size() > ngram_size:
         _logger.warning("Computed ngram size (%d) does not reflect supplied ngram size (%d), "
                         "some synonyms will be omitted", chief.compute_ngram_size(), ngram_size)
@@ -39,7 +48,7 @@ def lookup(path, keywords_file=None, stopwords_file=None,
         _logger.info("Processing file '%s'", file)
         try:
             content = CoreParser().parse_file(file)
-            tokens = Tokenizer(stopwords_file, ngram_size).tokenize(content)
+            tokens = tokenizer.tokenize(content)
             keywords = chief.extract_keywords(tokens)
         except Exception as exc:  # pylint: disable=broad-except
             if not ignore_errors:
@@ -119,3 +128,8 @@ def tf_idf(path):
 def get_registered_collectors():
     """Get all registered collectors."""
     return CollectorBase.get_registered_collectors()
+
+
+def get_registered_stemmers():
+    """Get all stemmers that are available in NLTK."""
+    return Stemmer.get_registered_stemmers()

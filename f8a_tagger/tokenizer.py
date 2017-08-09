@@ -16,19 +16,23 @@ class Tokenizer(object):
 
     _STOPWORDS_TXT = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data', 'stopwords.txt')
 
-    def __init__(self, stopwords_file=None, ngram_size=1):
+    def __init__(self, stopwords_file=None, ngram_size=1, lemmatizer=None, stemmer=None):
         """Construct.
 
         :param stopwords_file: path to stopwords file
         :type stopwords_file: str
         :param ngram_size: size of ngrams that should be constructed from tokens
         :type ngram_size: int
+        :param lemmatizer: lemmatizer instance to be used
+        :param stemmer: stemmer instance to be used
         """
         self._ngram_size = ngram_size
         _logger.debug('ngram size is %d', self._ngram_size)
 
         self._regexp_stopwords = []
         self._raw_stopwords = []
+        self._stemmer = stemmer
+        self._lemmatizer = lemmatizer
 
         with open(stopwords_file or self._STOPWORDS_TXT, 'r') as f:
             for word in f.read().split('\n'):
@@ -44,8 +48,45 @@ class Tokenizer(object):
                                         "stopword, missing space after?")
                     self._raw_stopwords.append(word)
 
-        _logger.debug('Registered raw stopwords: %s', self._raw_stopwords)
-        _logger.debug('Registered regexp stopwords: %s', [regexp.pattern for regexp in self._regexp_stopwords])
+        _logger.debug('Registered raw stopwords without lemmatization and stemming: %s', self._raw_stopwords)
+
+        self._lemmatize(self._raw_stopwords, stopwords=True)
+        self._stem(self._raw_stopwords, stopwords=True)
+
+        _logger.debug('Registered raw stopwords with lemmatization and stemming: %s', self._raw_stopwords)
+
+        _logger.debug('Registered regexp stopwords: %s',
+                      [regexp.pattern for regexp in self._regexp_stopwords])
+
+    def _lemmatize(self, tokens, stopwords=False):
+        """Lemmatize a list of tokens.
+
+        :param tokens: a list of tokens to lemmatize
+        """
+        if self._lemmatizer:
+            for idx, token in enumerate(tokens):
+                new_token = self._lemmatizer.lemmatize(token)
+                if new_token != token:
+                    _logger.debug("Lemmatized %s '%s' to '%s'",
+                                  'stopword' if stopwords else 'token', token, new_token)
+                    tokens[idx] = new_token
+        else:
+            _logger.debug("Lemmatization will not be performed.")
+
+    def _stem(self, tokens, stopwords=False):
+        """Perform stemming on a list of tokens.
+
+        :param tokens: a list of tokens to stem
+        """
+        if self._stemmer:
+            for idx, token in enumerate(tokens):
+                new_token = self._stemmer.stem(token)
+                if new_token != token:
+                    _logger.debug("Stemmed %s '%s' to '%s'",
+                                  'stopword' if stopwords else 'token', token, new_token)
+                    tokens[idx] = new_token
+        else:
+            _logger.debug("Stemming will not be performed.")
 
     def remove_stopwords(self, tokens):
         """Remove stopwords from token list.
@@ -80,7 +121,11 @@ class Tokenizer(object):
         :return: tokenized content
         """
         tokens = [token.lower() for token in nltk.word_tokenize(content)]
-        _logger.debug('Extracted tokens (size %d): %s', len(tokens), tokens)
+
+        _logger.debug('Extracted tokens without lemmatization and stemming (size %d): %s', len(tokens), tokens)
+        self._lemmatize(tokens)
+        self._stem(tokens)
+        _logger.debug('Extracted tokens with lemmatization and stemming (size %d): %s', len(tokens), tokens)
 
         if remove_stopwords:
             tokens = self.remove_stopwords(tokens)
@@ -89,7 +134,7 @@ class Tokenizer(object):
         for i in range(1, self._ngram_size):
             tokens += [" ".join(ngram) for ngram in zip(*[tokens[j:] for j in range(i + 1)])]
 
-        _logger.debug('Extracted tokens with ngrams (size %d, ngram size: %d): %s',
+        _logger.debug('Final tokens with ngrams (size %d, ngram size: %d): %s',
                       len(tokens), self._ngram_size, tokens)
 
         return tokens
