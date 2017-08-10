@@ -7,6 +7,7 @@ import re
 
 import anymarkup
 import daiquiri
+import f8a_tagger.defaults as defaults
 from f8a_tagger.errors import InvalidInputError
 
 _logger = daiquiri.getLogger(__name__)
@@ -24,8 +25,8 @@ class KeywordsChief(object):
         :param lemmatizer: lematizer instance to be used
         :param stemmer: stemmer instance to be used
         """
-        self._stemmer = stemmer
-        self._lemmatizer = lemmatizer
+        self._stemmer = stemmer or defaults.DEFAULT_STEMMER
+        self._lemmatizer = lemmatizer or defaults.DEFALUT_LEMMATIZER
 
         if isinstance(keyword_file, str) or keyword_file is None:
             with open(keyword_file or self._DEFAULT_KEYWORD_FILE_PATH, 'r') as f:
@@ -179,26 +180,10 @@ class KeywordsChief(object):
         """
         synonyms = set()
 
-        words = str(keyword).split('-')
-        if len(words) > 1:
-            synonyms.add(' '.join(words))
-            synonyms.add('.'.join(words))
-            synonyms.add('_'.join(words))
-            synonyms.add(''.join(words))
-
-        words = str(keyword).split('.')
-        if len(words) > 1:
-            synonyms.add(' '.join(words))
-            synonyms.add('-'.join(words))
-            synonyms.add('_'.join(words))
-            synonyms.add(''.join(words))
-
-        words = str(keyword).split('_')
-        if len(words) > 1:
-            synonyms.add(' '.join(words))
-            synonyms.add('-'.join(words))
-            synonyms.add('.'.join(words))
-            synonyms.add(''.join(words))
+        for delim in defaults.MULTIWORD_DELIMITERS:
+            words = str(keyword).split(delim)
+            for other_delim in defaults.MULTIWORD_DELIMITERS:
+                synonyms.add(other_delim.join(words))
 
         return list(synonyms)
 
