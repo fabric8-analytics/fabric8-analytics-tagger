@@ -123,6 +123,29 @@ def aggregate(input_keywords_file, no_synonyms=None, use_progressbar=False):
     return all_keywords
 
 
+def reckon(keywords_file=None, stopwords_file=None, stemmer=None, lemmatize=False):
+    """Compute keywords and stopwords based on stemmer and lemmatizer configuration.
+
+    :param keywords_file: keywords file to be used
+    :param stopwords_file: stopwords file to be used
+    :param stemmer: stemmer to be used
+    :param lemmatize: True if lemmatization should be done
+    :return: computed keywords and stopwords, duplicit entries are not removed
+    """
+    result = dict.fromkeys(('keywords', 'stopwords'))
+
+    stemmer_instance = Stemmer.get_stemmer(stemmer) if stemmer is not None else None
+    lemmatizer_instance = Lemmatizer.get_lemmatizer() if lemmatize else None
+
+    chief = KeywordsChief(keywords_file, lemmatizer=lemmatizer_instance, stemmer=stemmer_instance)
+    tokenizer = Tokenizer(stopwords_file, lemmatizer=lemmatizer_instance, stemmer=stemmer_instance)
+
+    result['keywords'] = chief.keywords
+    result['stopwords'] = sorted(tokenizer.raw_stopwords) + sorted(tokenizer.regexp_stopwords)
+
+    return result
+
+
 def tf_idf(path):
     """Compute TF-IDF on the given corpus described by directory tree."""
     raise NotImplementedError("Computing TF-IDF is currently not supported")
