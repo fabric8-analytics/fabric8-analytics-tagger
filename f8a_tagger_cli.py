@@ -165,9 +165,9 @@ def cli_diff(keywords1_file_path, keywords2_file_path, synonyms_only=False, keyw
 @click.option('-f', '--output-format',
               help='Output keywords format/type.')
 @click.option('--stemmer', type=click.Choice(get_registered_stemmers()), multiple=False,
-              help='Stemmer type to be used.')
+              help='Stemmer type to be used, default: %s.' % defaults.DEFAULT_STEMMER)
 @click.option('--lemmatize', is_flag=True,
-              help='Use lemmatizer.')
+              help='Use lemmatizer, default: %s' % defaults.DEFAULT_LEMMATIZER)
 def cli_reckon(**kwargs):
     """Compute keywords and stopwords based on stemmer and lemmatizer configuration."""
     output_file = kwargs.pop('output_file')
