@@ -27,7 +27,7 @@ class KeywordsChief(object):
         :param stemmer: stemmer instance to be used
         """
         self._stemmer = stemmer or defaults.DEFAULT_STEMMER
-        self._lemmatizer = lemmatizer or defaults.DEFALUT_LEMMATIZER
+        self._lemmatizer = lemmatizer or defaults.DEFAULT_LEMMATIZER
 
         if isinstance(keyword_file, str) or keyword_file is None:
             with open(keyword_file or self._DEFAULT_KEYWORD_FILE_PATH, 'r') as f:
