@@ -140,21 +140,31 @@ class Tokenizer(object):
         :type remove_stopwords: bool
         :return: tokenized content
         """
-        tokens = [token.lower() for token in nltk.word_tokenize(content)]
+        sentences = nltk.sent_tokenize(content)
 
-        _logger.debug('Extracted tokens without lemmatization and stemming (size %d): %s', len(tokens), tokens)
-        self._lemmatize(tokens)
-        self._stem(tokens)
-        _logger.debug('Extracted tokens with lemmatization and stemming (size %d): %s', len(tokens), tokens)
+        for idx, sentence in enumerate(sentences):
+            sentences[idx] = [token.lower() for token in nltk.word_tokenize(sentence)]
+
+        _logger.debug('Extracted tokens without lemmatization and stemming: %s', sentences)
+
+        for idx, sentence in enumerate(sentences):
+            self._lemmatize(sentence)
+            self._stem(sentence)
+        _logger.debug('Extracted tokens with lemmatization and stemming: %s', sentences)
 
         if remove_stopwords:
-            tokens = self.remove_stopwords(tokens)
-            _logger.debug('Extracted tokens without stopwords (size: %d): %s', len(tokens), tokens)
+            for idx, sentence in enumerate(sentences):
+                sentences[idx] = self.remove_stopwords(sentence)
+            _logger.debug('Extracted tokens without stopwords: %s', sentences)
 
-        for i in range(1, self._ngram_size):
-            tokens += [" ".join(ngram) for ngram in zip(*[tokens[j:] for j in range(i + 1)])]
+        # append computed ngrams at the end
+        if self._ngram_size > 1:
+            sentences.append([])
 
-        _logger.debug('Final tokens with ngrams (size %d, ngram size: %d): %s',
-                      len(tokens), self._ngram_size, tokens)
+        for sentence in sentences[:-1]:
+            for i in range(1, self._ngram_size):
+                sentences[-1] += [" ".join(ngram) for ngram in zip(*[sentence[j:] for j in range(i + 1)])]
 
-        return tokens
+        _logger.debug('Final tokens with ngrams (ngram size: %d): %s', self._ngram_size, sentences)
+
+        return sentences

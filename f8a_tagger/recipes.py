@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Keywords extraction/tagging for fabric8-analytics."""
 
+from itertools import chain
+
 import anymarkup
 import daiquiri
 from f8a_tagger.collectors import CollectorBase
@@ -35,6 +37,9 @@ def lookup(path, keywords_file=None, stopwords_file=None,
     """
     ret = {}
 
+    stemmer_instance = Stemmer.get_stemmer(stemmer) if stemmer is not None else None
+    lemmatizer_instance = Lemmatizer.get_lemmatizer() if lemmatize else None
+
     chief = KeywordsChief(keywords_file, lemmatizer=lemmatizer_instance, stemmer=stemmer_instance)
     computed_ngram_size = chief.compute_ngram_size()
     if ngram_size is not None and computed_ngram_size > ngram_size:
@@ -43,8 +48,6 @@ def lookup(path, keywords_file=None, stopwords_file=None,
     elif ngram_size is None:
         ngram_size = computed_ngram_size
 
-    stemmer_instance = Stemmer.get_stemmer(stemmer) if stemmer is not None else None
-    lemmatizer_instance = Lemmatizer.get_lemmatizer() if lemmatize else None
     tokenizer = Tokenizer(stopwords_file, ngram_size, lemmatizer=lemmatizer_instance, stemmer=stemmer_instance)
 
     for file in progressbarize(iter_files(path, ignore_errors), progress=use_progressbar):
@@ -52,6 +55,8 @@ def lookup(path, keywords_file=None, stopwords_file=None,
         try:
             content = CoreParser().parse_file(file)
             tokens = tokenizer.tokenize(content)
+            # We do not perform any analysis on sentences now, so treat all tokens as one array (sentences of tokens).
+            tokens = chain(*tokens)
             keywords = chief.extract_keywords(tokens)
         except Exception as exc:  # pylint: disable=broad-except
             if not ignore_errors:

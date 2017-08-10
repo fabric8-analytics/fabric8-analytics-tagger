@@ -38,6 +38,9 @@ class KeywordsChief(object):
         self._keywords = anymarkup.parse(content)
         del content
 
+        # make sure keywords are strings
+        self._keywords = dict((str(keyword), val) for keyword, val in self._keywords.items())
+
         # add missing default values
         for keyword in self._keywords.keys():
             if self._keywords[keyword] is None:
@@ -45,6 +48,9 @@ class KeywordsChief(object):
 
             if self._keywords[keyword].get('synonyms') is None:
                 self._keywords[keyword]['synonyms'] = []
+
+            # make sure synonyms are strings
+            self._keywords[keyword]['synonyms'] = list(map(lambda x: str(x), self._keywords[keyword]['synonyms']))
 
             if self._keywords[keyword].get('regexp') is None:
                 self._keywords[keyword]['regexp'] = []
@@ -65,7 +71,8 @@ class KeywordsChief(object):
                     new_synonym = delim.join(synonyms)
 
                     if new_synonym != synonym:
-                        _logger.debug("Stemmed and lemmatized keyword synonym from '%s' to '%s'", synonym, new_synonym)
+                        _logger.debug("Stemmed and lemmatized keyword synonym from '%s' to '%s' for keyword '%s'",
+                                      synonym, new_synonym, keyword)
                         entry['synonyms'][idx] = new_synonym
 
     @property
