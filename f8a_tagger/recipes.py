@@ -20,7 +20,7 @@ _logger = daiquiri.getLogger(__name__)
 
 def lookup(path, keywords_file=None, stopwords_file=None,
            ignore_errors=False, ngram_size=None, use_progressbar=False, lemmatize=False, stemmer=None):
-    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-arguments,too-many-locals
     """Perform keywords lookup.
 
     :param path: path of directory tree or file on which the lookup should be done
@@ -154,11 +154,6 @@ def reckon(keywords_file=None, stopwords_file=None, stemmer=None, lemmatize=Fals
     result['stopwords'] = sorted(tokenizer.raw_stopwords) + sorted(tokenizer.regexp_stopwords)
 
     return result
-
-
-def tf_idf(path):
-    """Compute TF-IDF on the given corpus described by directory tree."""
-    raise NotImplementedError("Computing TF-IDF is currently not supported")
 
 
 def get_registered_collectors():
