@@ -102,6 +102,11 @@ def aggregate(input_keywords_file, no_synonyms=None, use_progressbar=False):
         input_content = anymarkup.parse_file(input_file)
         for keyword, value in input_content.items():
             keyword = str(keyword)
+
+            if not KeywordsChief.matches_keyword_pattern(keyword):
+                _logger.debug("Dropping keyword '%s' as it does not match keyword pattern.", keyword)
+                continue
+
             if keyword in all_keywords.keys() and value is not None and all_keywords[keyword] is not None:
                 all_keywords[keyword]['occurrence_count'] = value.pop('occurrence_count', 0) +\
                                                             all_keywords[keyword].get('occurrence_count', 0)
