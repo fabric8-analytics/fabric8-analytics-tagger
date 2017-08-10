@@ -17,6 +17,7 @@ from f8a_tagger import get_registered_stemmers
 from f8a_tagger import lookup
 from f8a_tagger import reckon
 from f8a_tagger import tf_idf
+import f8a_tagger.defaults as defaults
 from f8a_tagger.utils import json_dumps
 
 _logger = daiquiri.getLogger(__name__)
@@ -35,6 +36,8 @@ def _print_result(result, output_file, fmt=None):
             extension = output_file.split('.')[-1]
             if extension in ('yaml', 'yml', 'json'):
                 fmt = extension if extension != 'yml' else 'yaml'
+            else:
+                fmt = defaults.DEFAULT_OUTPUT_FORMAT
         _logger.debug("Serializing output to file '%s'", output_file)
         anymarkup.serialize_file(result, output_file, format=fmt)
 
@@ -61,9 +64,9 @@ def cli(verbose=0):
 @click.option('-f', '--output-format',
               help='Output keywords format/type.')
 @click.option('--stemmer', type=click.Choice(get_registered_stemmers()), multiple=False,
-              help='Stemmer type to be used.')
+              help='Stemmer type to be used, default: %s.' % defaults.DEFAULT_STEMMER)
 @click.option('--lemmatize', is_flag=True,
-              help='Use lemmatizer.')
+              help='Use lemmatizer, default: %s' % defaults.DEFAULT_LEMMATIZER)
 @click.option('--ngram-size', default=None, type=int,
               help='Ngram size - e.g. 2 for bigrams, if not provided, '
                    'ngram size is computed based on keywords.yaml file.')

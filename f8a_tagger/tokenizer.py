@@ -8,6 +8,7 @@ import re
 import nltk
 
 import daiquiri
+import f8a_tagger.defaults as defaults
 from f8a_tagger.errors import InvalidInputError
 
 _logger = daiquiri.getLogger(__name__)
@@ -33,8 +34,8 @@ class Tokenizer(object):
 
         self._regexp_stopwords = []
         self._raw_stopwords = []
-        self._stemmer = stemmer
-        self._lemmatizer = lemmatizer
+        self._stemmer = stemmer or defaults.DEFAULT_STEMMER
+        self._lemmatizer = lemmatizer or defaults.DEFAULT_LEMMATIZER
 
         if isinstance(stopwords_file, str) or stopwords_file is None:
             with open(stopwords_file or self._STOPWORDS_TXT, 'r') as f:
