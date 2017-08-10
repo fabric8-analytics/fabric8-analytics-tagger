@@ -17,6 +17,7 @@ class KeywordsChief(object):
     """Keeping and interacting with keywords."""
 
     _DEFAULT_KEYWORD_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data', 'keywords.yaml')
+    _KEYWORD_PATTERN = re.compile('[0-9a-zA-Z][0-9a-zA-Z-_.]*')
 
     def __init__(self, keyword_file=None, lemmatizer=False, stemmer=None):
         """Construct.
@@ -223,6 +224,16 @@ class KeywordsChief(object):
         :return: True if the given word is a keyword
         """
         return self._keywords.get(word) is not None
+
+    @classmethod
+    def matches_keyword_pattern(cls, keyword):
+        """Match keyword candidate against keyword regular expression.
+
+        :param keyword: keyword to be matched
+        :return: True if the given keyword matches keyword pattern
+        :rtype: bool
+        """
+        return len(keyword) >= 2 and re.fullmatch(cls._KEYWORD_PATTERN, keyword)
 
     def filter_keywords(self, keywords):
         """Filter and transcript keywords.
