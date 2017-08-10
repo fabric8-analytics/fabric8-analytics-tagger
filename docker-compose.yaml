@@ -1,9 +1,0 @@
-version: "2"
-services:
-  tagger:
-    image: registry.devshift.net/bayesian/coreapi-tagger
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: coreapi-tagger
-    network_mode: bridge
