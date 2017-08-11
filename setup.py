@@ -38,6 +38,7 @@ setup(
     package_data={
         'f8a_tagger': [
             os.path.join('data', '*.yaml'),
+            os.path.join('data', '*.txt')
         ]
     },
     install_requires=get_requirements(),
