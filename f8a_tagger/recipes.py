@@ -6,6 +6,7 @@ from itertools import chain
 import anymarkup
 import daiquiri
 from f8a_tagger.collectors import CollectorBase
+import f8a_tagger.defaults as defaults
 from f8a_tagger.keywords_chief import KeywordsChief
 from f8a_tagger.keywords_set import KeywordsSet
 from f8a_tagger.lemmatizer import Lemmatizer
@@ -91,7 +92,7 @@ def collect(collector=None, ignore_errors=False, use_progressbar=False):
     return keywords_set.keywords
 
 
-def aggregate(input_keywords_file, no_synonyms=None, use_progressbar=False):
+def aggregate(input_keywords_file, no_synonyms=None, use_progressbar=False):  # pylint: disable=too-many-branches
     """Aggregate available topics.
 
     :param input_keywords_file: a list/tuple of input keywords files to process
@@ -129,6 +130,15 @@ def aggregate(input_keywords_file, no_synonyms=None, use_progressbar=False):
                     if all_keywords[str(keyword)] is None:
                         all_keywords[str(keyword)] = {}
                     all_keywords[str(keyword)]['synonyms'] = synonyms
+
+    # filter out keywords with low occurrence count
+    if defaults.OCCURRENCE_COUNT_FILTER > 1:
+        result = {}
+        for keyword, value in all_keywords.items():
+            if value.get('occurrence_count', 1) > defaults.OCCURRENCE_COUNT_FILTER:
+                result[keyword] = value
+
+        return result
 
     return all_keywords
 
