@@ -19,7 +19,7 @@ class KeywordsChief(object):
     _DEFAULT_KEYWORD_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data', 'keywords.yaml')
     _KEYWORD_PATTERN = re.compile('[0-9a-zA-Z][0-9a-zA-Z-_.]*')
 
-    def __init__(self, keyword_file=None, lemmatizer=False, stemmer=None):
+    def __init__(self, keyword_file=None, lemmatizer=False, stemmer=None):  # pylint: disable=too-many-branches
         """Construct.
 
         :param keyword_file: a path to keyword file
@@ -52,7 +52,7 @@ class KeywordsChief(object):
                 self._keywords[keyword]['synonyms'] = []
 
             # make sure synonyms are strings
-            self._keywords[keyword]['synonyms'] = list(map(lambda x: str(x), self._keywords[keyword]['synonyms']))
+            self._keywords[keyword]['synonyms'] = list(map(str, self._keywords[keyword]['synonyms']))
 
             if self._keywords[keyword].get('regexp') is None:
                 self._keywords[keyword]['regexp'] = []
@@ -79,7 +79,7 @@ class KeywordsChief(object):
 
     @property
     def keywords(self):
-        """Keywords used by keywords chief instance."""
+        """Get keywords used by keywords chief instance."""
         ret = {}
 
         for keyword in self._keywords.keys():
@@ -234,14 +234,3 @@ class KeywordsChief(object):
         :rtype: bool
         """
         return len(keyword) >= 2 and re.fullmatch(cls._KEYWORD_PATTERN, keyword)
-
-    def filter_keywords(self, keywords):
-        """Filter and transcript keywords.
-
-        :param keywords: keywords to be filtered as stated in the configuration file
-        :type: dict
-        :return: filtered keywords
-        :rtype: dict
-        """
-        # TODO: implement
-        return keywords

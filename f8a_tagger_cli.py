@@ -16,7 +16,6 @@ from f8a_tagger import get_registered_collectors
 from f8a_tagger import get_registered_stemmers
 from f8a_tagger import lookup
 from f8a_tagger import reckon
-from f8a_tagger import tf_idf
 import f8a_tagger.defaults as defaults
 from f8a_tagger.utils import json_dumps
 
@@ -174,20 +173,6 @@ def cli_reckon(**kwargs):
     output_format = kwargs.pop('output_format')
     ret = reckon(**kwargs)
     _print_result(ret, output_file, output_format)
-
-
-@cli.command('tf-idf')
-@click.argument('path', type=click.Path(exists=True, file_okay=True, dir_okay=True))
-@click.option('-o', '--output-keywords-file',
-              help='Output keywords file with aggregated keywords.')
-@click.option('-f', '--output-format',
-              help='Output keywords file format/type.')
-def cli_tf_idf(path, **kwargs):
-    """Compute TF-IDF on the given corpus given by directory structure."""
-    output_keywords_file = kwargs.pop('output_keywords_file')
-    output_format = kwargs.pop('output_format')
-    result = tf_idf(path, **kwargs)
-    _print_result(result, output_keywords_file, output_format)
 
 
 if __name__ == '__main__':

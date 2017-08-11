@@ -4,7 +4,7 @@
 from nltk.stem.wordnet import WordNetLemmatizer
 
 
-class Lemmatizer(object):
+class Lemmatizer(object):  # pylint: disable=too-few-public-methods
     """Lemmatizer producer."""
 
     @classmethod
