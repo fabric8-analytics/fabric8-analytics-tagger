@@ -13,6 +13,8 @@ from .recipes import aggregate
 from .recipes import collect
 from .recipes import get_registered_collectors
 from .recipes import get_registered_stemmers
-from .recipes import lookup
+from .recipes import lookup_file
+from .recipes import lookup_readme
+from .recipes import lookup_text
 from .recipes import reckon
 from .tokenizer import Tokenizer

@@ -7,6 +7,7 @@ import anymarkup
 import daiquiri
 from f8a_tagger.collectors import CollectorBase
 import f8a_tagger.defaults as defaults
+from f8a_tagger.errors import InvalidInputError
 from f8a_tagger.keywords_chief import KeywordsChief
 from f8a_tagger.keywords_set import KeywordsSet
 from f8a_tagger.lemmatizer import Lemmatizer
@@ -19,10 +20,51 @@ from f8a_tagger.utils import progressbarize
 _logger = daiquiri.getLogger(__name__)
 
 
-def lookup(path, keywords_file=None, stopwords_file=None,
-           ignore_errors=False, ngram_size=None, use_progressbar=False, lemmatize=False, stemmer=None):
+def _prepare_lookup(keywords_file=None, stopwords_file=None, ngram_size=None, lemmatize=False, stemmer=None):
+    # pylint: disable=too-many-arguments
+    """Prepare resources for keywords lookup.
+
+    :param keywords_file: keywords file to be used
+    :param stopwords_file: stopwords file to be used
+    :param ngram_size: size of ngrams, if None, ngram size is computed
+    :param lemmatize: use lemmatizer
+    :type lemmatize: bool
+    :param stemmer: stemmer to be used
+    :type stemmer: str
+    """
+    stemmer_instance = Stemmer.get_stemmer(stemmer) if stemmer is not None else None
+    lemmatizer_instance = Lemmatizer.get_lemmatizer() if lemmatize else None
+
+    chief = KeywordsChief(keywords_file, lemmatizer=lemmatizer_instance, stemmer=stemmer_instance)
+    computed_ngram_size = chief.compute_ngram_size()
+    if ngram_size is not None and computed_ngram_size > ngram_size:
+        _logger.warning("Computed ngram size (%d) does not reflect supplied ngram size (%d), "
+                        "some synonyms will be omitted", chief.compute_ngram_size(), ngram_size)
+    elif ngram_size is None:
+        ngram_size = computed_ngram_size
+
+    tokenizer = Tokenizer(stopwords_file, ngram_size, lemmatizer=lemmatizer_instance, stemmer=stemmer_instance)
+
+    return ngram_size, tokenizer, chief, CoreParser()
+
+
+def _perform_lookup(content, tokenizer, chief):
+    """Perform actual keyword lookup.
+
+    :param content: content on which keyword lookup should be performed
+    :param tokenizer: tokenizer instance to be used
+    :param chief: keywords chief instance to be used
+    """
+    tokens = tokenizer.tokenize(content)
+    # We do not perform any analysis on sentences now, so treat all tokens as one array (sentences of tokens).
+    tokens = chain(*tokens)
+    return chief.extract_keywords(tokens)
+
+
+def lookup_file(path, keywords_file=None, stopwords_file=None,
+                ignore_errors=False, ngram_size=None, use_progressbar=False, lemmatize=False, stemmer=None):
     # pylint: disable=too-many-arguments,too-many-locals
-    """Perform keywords lookup.
+    """Perform keywords lookup on a file or directory tree of files.
 
     :param path: path of directory tree or file on which the lookup should be done
     :param keywords_file: keywords file to be used
@@ -37,28 +79,16 @@ def lookup(path, keywords_file=None, stopwords_file=None,
     :return: found keywords, reported per file
     """
     ret = {}
-
-    stemmer_instance = Stemmer.get_stemmer(stemmer) if stemmer is not None else None
-    lemmatizer_instance = Lemmatizer.get_lemmatizer() if lemmatize else None
-
-    chief = KeywordsChief(keywords_file, lemmatizer=lemmatizer_instance, stemmer=stemmer_instance)
-    computed_ngram_size = chief.compute_ngram_size()
-    if ngram_size is not None and computed_ngram_size > ngram_size:
-        _logger.warning("Computed ngram size (%d) does not reflect supplied ngram size (%d), "
-                        "some synonyms will be omitted", chief.compute_ngram_size(), ngram_size)
-    elif ngram_size is None:
-        ngram_size = computed_ngram_size
-
-    tokenizer = Tokenizer(stopwords_file, ngram_size, lemmatizer=lemmatizer_instance, stemmer=stemmer_instance)
-
+    ngram_size, tokenizer, chief, core_parser = _prepare_lookup(keywords_file,
+                                                                stopwords_file,
+                                                                ngram_size,
+                                                                lemmatize,
+                                                                stemmer)
     for file in progressbarize(iter_files(path, ignore_errors), progress=use_progressbar):
         _logger.info("Processing file '%s'", file)
         try:
-            content = CoreParser().parse_file(file)
-            tokens = tokenizer.tokenize(content)
-            # We do not perform any analysis on sentences now, so treat all tokens as one array (sentences of tokens).
-            tokens = chain(*tokens)
-            keywords = chief.extract_keywords(tokens)
+            content = core_parser.parse_file(file)
+            keywords = _perform_lookup(content, tokenizer, chief)
         except Exception as exc:  # pylint: disable=broad-except
             if not ignore_errors:
                 raise
@@ -68,6 +98,63 @@ def lookup(path, keywords_file=None, stopwords_file=None,
         ret[file] = keywords
 
     return ret
+
+
+def lookup_readme(readme, keywords_file=None, stopwords_file=None, ngram_size=None, lemmatize=False, stemmer=None):
+    # pylint: disable=too-many-arguments
+    """Perform keywords lookup in a parsed README.json dict.
+
+    :param readme: parsed README.json file
+    :param keywords_file: keywords file to be used
+    :param stopwords_file: stopwords file to be used
+    :param ngram_size: size of ngrams, if None, ngram size is computed
+    :param lemmatize: use lemmatizer
+    :type lemmatize: bool
+    :param stemmer: stemmer to be used
+    :type stemmer: str
+    :return: found keywords
+    """
+    ngram_size, tokenizer, chief, core_parser = _prepare_lookup(keywords_file,
+                                                                stopwords_file,
+                                                                ngram_size,
+                                                                lemmatize,
+                                                                stemmer)
+    if not isinstance(readme, dict):
+        raise InvalidInputError("Invalid README passed '%s' (type: %s), should be dict or JSON"
+                                % (readme, type(readme)))
+
+    content = readme.get('content')
+    content_type = readme.get('type')
+    if not content:
+        raise InvalidInputError("No content provided in README: '%s'" % readme)
+    if not content_type:
+        raise InvalidInputError("No content type provided in README.json")
+
+    return _perform_lookup(core_parser.parse(content, content_type), tokenizer, chief)
+
+
+def lookup_text(text, keywords_file=None, stopwords_file=None, ngram_size=None, lemmatize=False, stemmer=None):
+    # pylint: disable=too-many-arguments
+    """Perform keywords lookup on a plain text.
+
+    :param text: plain text on which keywords lookup should be performed
+    :param keywords_file: keywords file to be used
+    :param stopwords_file: stopwords file to be used
+    :param ngram_size: size of ngrams, if None, ngram size is computed
+    :param lemmatize: use lemmatizer
+    :type lemmatize: bool
+    :param stemmer: stemmer to be used
+    :type stemmer: str
+    :return: found keywords
+    """
+    ngram_size, tokenizer, chief, core_parser = _prepare_lookup(keywords_file,
+                                                                stopwords_file,
+                                                                ngram_size,
+                                                                lemmatize,
+                                                                stemmer)
+    if not isinstance(text, str):
+        raise InvalidInputError("Invalid text passed '%s' (type: %s), should be string" % (text, type(text)))
+    return _perform_lookup(core_parser.parse(text, 'txt'), tokenizer, chief)
 
 
 def collect(collector=None, ignore_errors=False, use_progressbar=False):
