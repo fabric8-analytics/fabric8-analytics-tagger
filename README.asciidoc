@@ -102,11 +102,11 @@ The overall high-level overview of the `lookup` command can be described in the 
 
 3. Sentences are tokenized into words. This tokenization is done, again, in a smart way ("e.g. isn't" is split into three tokens - "e.g", "is" and "n't".
 
-4. Unwanted tokens are removed - tokens are checked against stopwords file and if there is a match, unwanted tokens are removed. This step ensures that the lookup will perform faster and we also remove obviously wrong words that shouldn't be marked as keywords (words with high entropy).
+4. link:https://en.wikipedia.org/wiki/Lemmatisation[Lemmatization] - all words (tokens) are replaced with their representative as words appear in several inflected forms. Lemmatization uses NLTK's WordNet corpus (large lexical database of English words).
 
-5. link:https://en.wikipedia.org/wiki/Lemmatisation[Lemmatization] - all words (tokens) are replaced with their representative as words appear in several inflected forms. Lemmatization uses NLTK's WordNet corpus (large lexical database of English words).
+5. After lemmatization there is performed link:https://en.wikipedia.org/wiki/Stemming[stemming]. Stemming ensures that different words are mapped to their word stem (e.g. "licencing", "license" is same). There are available different stemmers, check `lookup --help` for listing of all available ones. Check out link:https://nlp.stanford.edu/IR-book/html/htmledition/stemming-and-lemmatization-1.html[Standford's NLP] for more insights on lemmatization and stemming.
 
-6. After lemmatization there is performed link:https://en.wikipedia.org/wiki/Stemming[stemming]. Stemming ensures that different words are mapped to their word stem (e.g. "licencing", "license" is same). There are available different stemmers, check `lookup --help` for listing of all available ones. Check out link:https://nlp.stanford.edu/IR-book/html/htmledition/stemming-and-lemmatization-1.html[Standford's NLP] for more insights on lemmatization and stemming.
+6. Unwanted tokens are removed - tokens are checked against stopwords file and if there is a match, unwanted tokens are removed. This step ensures that the lookup will perform faster and we also remove obviously wrong words that shouldn't be marked as keywords (words with high entropy).
 
 7. There are calculated ngrams for multi-word keywords by systematically concatenating tokens (e.g. tokens `["this", "is", "machine", "learning"]` with ngram size equal to 2 create the following tokens: `["this", "is", "machine", "learning", "this is", "is machine", "machine learning"]`. This step ensures that there can be performed lookup of multi-word keywords (such as "machine learning"). The actual ngrams size (bigrams, trigrams) is determined by `keywords.yaml` configuration file (based on synonyms), but can be explicitly stated using `--ngram-size` option.
 
