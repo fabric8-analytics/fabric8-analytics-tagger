@@ -6,7 +6,6 @@ from itertools import chain
 import anymarkup
 import daiquiri
 from f8a_tagger.collectors import CollectorBase
-import f8a_tagger.defaults as defaults
 from f8a_tagger.errors import InvalidInputError
 from f8a_tagger.keywords_chief import KeywordsChief
 from f8a_tagger.keywords_set import KeywordsSet
@@ -179,16 +178,19 @@ def collect(collector=None, ignore_errors=False, use_progressbar=False):
     return keywords_set.keywords
 
 
-def aggregate(input_keywords_file, no_synonyms=None, use_progressbar=False):  # pylint: disable=too-many-branches
+def aggregate(input_keywords_file, no_synonyms=None, use_progressbar=False, occurrence_count_filter=None):  # pylint: disable=too-many-branches
     """Aggregate available topics.
 
     :param input_keywords_file: a list/tuple of input keywords files to process
     :param no_synonyms: do not compute synonyms for keywords
     :param use_progressbar: use progressbar to report progress
+    :param occurrence_count_filter: filter out keywords with low occurrence count
     :return:
     """
     if not input_keywords_file:
         raise ValueError('No input keywords files provided')
+
+    occurrence_count_filter = occurrence_count_filter or 0
 
     all_keywords = {}
     for input_file in progressbarize(input_keywords_file or [], use_progressbar):
@@ -219,10 +221,10 @@ def aggregate(input_keywords_file, no_synonyms=None, use_progressbar=False):  # 
                     all_keywords[str(keyword)]['synonyms'] = synonyms
 
     # filter out keywords with low occurrence count
-    if defaults.OCCURRENCE_COUNT_FILTER > 1:
+    if occurrence_count_filter > 1:
         result = {}
         for keyword, value in all_keywords.items():
-            if value.get('occurrence_count', 1) > defaults.OCCURRENCE_COUNT_FILTER:
+            if value.get('occurrence_count', 1) > occurrence_count_filter:
                 result[keyword] = value
 
         return result
