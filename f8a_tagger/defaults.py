@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Default values and configuration."""
 
+
 # Possible word delimiters for synonyms.
 MULTIWORD_DELIMITERS = (' ', '-', '_', '/')
 
@@ -17,3 +18,6 @@ DEFAULT_LEMMATIZER = None
 
 # Filter keywords that have low occurrence.
 OCCURRENCE_COUNT_FILTER = 2
+
+# Scoring mechanism used.
+DEFAULT_SCORER = 'Count'
