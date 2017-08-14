@@ -96,17 +96,21 @@ def cli_collect(**kwargs):
 
 @cli.command('aggregate')
 @click.option('-i', '--input-keywords-file', multiple=True,
-              help="Input keywords files to use.")
+              help='Input keywords files to use.')
 @click.option('-o', '--output-keywords-file',
               help='Output keywords file with aggregated keywords.')
 @click.option('-f', '--output-format',
               help='Output keywords file format/type.')
 @click.option('--no-synonyms',
-              help="Do not compute synonyms.")
+              help='Do not compute synonyms.')
+@click.option('--occurrence-count-filter', type=int,
+              help="Filter out synonyms with low occurrence count (default: %d)." % defaults.OCCURRENCE_COUNT_FILTER)
 def cli_aggregate(**kwargs):
     """Aggregate keywords to a single file."""
     output_keywords_file = kwargs.pop('output_keywords_file')
     output_format = kwargs.pop('output_format')
+    if kwargs['occurrence_count_filter'] is None:
+        kwargs['occurrence_count_filter'] = defaults.OCCURRENCE_COUNT_FILTER
     ret = aggregate(use_progressbar=True, **kwargs)
     _print_result(ret, output_keywords_file, output_format)
 
