@@ -2,6 +2,7 @@
 """Keywords extraction/tagging for fabric8-analytics."""
 
 import logging
+import operator
 import sys
 
 import click
@@ -13,6 +14,7 @@ import daiquiri
 from f8a_tagger import aggregate
 from f8a_tagger import collect
 from f8a_tagger import get_registered_collectors
+from f8a_tagger import get_registered_scorers
 from f8a_tagger import get_registered_stemmers
 from f8a_tagger import lookup_file
 from f8a_tagger import reckon
@@ -69,12 +71,23 @@ def cli(verbose=0):
 @click.option('--ngram-size', default=None, type=int,
               help='Ngram size - e.g. 2 for bigrams, if not provided, '
                    'ngram size is computed based on keywords.yaml file.')
+@click.option('--scorer', type=click.Choice(get_registered_scorers()), multiple=False,
+              help='Keywords scoring mechanism to be used, default: %s' % defaults.DEFAULT_SCORER)
+@click.option('--summary', '-s', is_flag=True,
+              help='Print sorted summary.')
 def cli_lookup(path, **kwargs):
     """Perform keywords lookup."""
     output_file = kwargs.pop('output_file')
     output_format = kwargs.pop('output_format')
+    summary = kwargs.pop('summary')
     ret = lookup_file(path, use_progressbar=True, **kwargs)
-    _print_result(ret, output_file, output_format)
+    if summary:
+        total = {}
+        for f in ret:
+            total[f] = sorted(ret[f].items(), key=operator.itemgetter(1), reverse=True)
+        _print_result(total, output_file, output_format)
+    else:
+        _print_result(ret, output_file, output_format)
 
 
 @cli.command('collect')

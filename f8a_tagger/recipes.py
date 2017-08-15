@@ -11,6 +11,7 @@ from f8a_tagger.keywords_chief import KeywordsChief
 from f8a_tagger.keywords_set import KeywordsSet
 from f8a_tagger.lemmatizer import Lemmatizer
 from f8a_tagger.parsers import CoreParser
+from f8a_tagger.scoring import Scoring
 from f8a_tagger.stemmer import Stemmer
 from f8a_tagger.tokenizer import Tokenizer
 from f8a_tagger.utils import iter_files
@@ -47,21 +48,26 @@ def _prepare_lookup(keywords_file=None, stopwords_file=None, ngram_size=None, le
     return ngram_size, tokenizer, chief, CoreParser()
 
 
-def _perform_lookup(content, tokenizer, chief):
+def _perform_lookup(content, tokenizer, chief, scorer):
     """Perform actual keyword lookup.
 
     :param content: content on which keyword lookup should be performed
     :param tokenizer: tokenizer instance to be used
     :param chief: keywords chief instance to be used
+    :param scorer: name of scorer to be used
+    :type scorer: str
     """
     tokens = tokenizer.tokenize(content)
     # We do not perform any analysis on sentences now, so treat all tokens as one array (sentences of tokens).
     tokens = chain(*tokens)
-    return chief.extract_keywords(tokens)
+    keywords = chief.extract_keywords(tokens)
+    scorer = Scoring.get_scoring(scorer or defaults.DEFAULT_SCORER)
+    return scorer.score(chief, keywords)
 
 
 def lookup_file(path, keywords_file=None, stopwords_file=None,
-                ignore_errors=False, ngram_size=None, use_progressbar=False, lemmatize=False, stemmer=None):
+                ignore_errors=False, ngram_size=None, use_progressbar=False,
+                lemmatize=False, stemmer=None, scorer=None):
     # pylint: disable=too-many-arguments,too-many-locals
     """Perform keywords lookup on a file or directory tree of files.
 
@@ -75,6 +81,8 @@ def lookup_file(path, keywords_file=None, stopwords_file=None,
     :type lemmatize: bool
     :param stemmer: stemmer to be used
     :type stemmer: str
+    :param scorer: scorer to be used
+    :type scorer: f8a_tagger.scoring.Scoring
     :return: found keywords, reported per file
     """
     ret = {}
@@ -87,7 +95,7 @@ def lookup_file(path, keywords_file=None, stopwords_file=None,
         _logger.info("Processing file '%s'", file)
         try:
             content = core_parser.parse_file(file)
-            keywords = _perform_lookup(content, tokenizer, chief)
+            keywords = _perform_lookup(content, tokenizer, chief, scorer)
         except Exception as exc:  # pylint: disable=broad-except
             if not ignore_errors:
                 raise
@@ -99,7 +107,8 @@ def lookup_file(path, keywords_file=None, stopwords_file=None,
     return ret
 
 
-def lookup_readme(readme, keywords_file=None, stopwords_file=None, ngram_size=None, lemmatize=False, stemmer=None):
+def lookup_readme(readme, keywords_file=None, stopwords_file=None, ngram_size=None,
+                  lemmatize=False, stemmer=None, scorer=None):
     # pylint: disable=too-many-arguments
     """Perform keywords lookup in a parsed README.json dict.
 
@@ -111,6 +120,8 @@ def lookup_readme(readme, keywords_file=None, stopwords_file=None, ngram_size=No
     :type lemmatize: bool
     :param stemmer: stemmer to be used
     :type stemmer: str
+    :param scorer: scorer to be used
+    :type scorer: f8a_tagger.scoring.Scoring
     :return: found keywords
     """
     ngram_size, tokenizer, chief, core_parser = _prepare_lookup(keywords_file,
@@ -129,10 +140,11 @@ def lookup_readme(readme, keywords_file=None, stopwords_file=None, ngram_size=No
     if not content_type:
         raise InvalidInputError("No content type provided in README.json")
 
-    return _perform_lookup(core_parser.parse(content, content_type), tokenizer, chief)
+    return _perform_lookup(core_parser.parse(content, content_type), tokenizer, chief, scorer)
 
 
-def lookup_text(text, keywords_file=None, stopwords_file=None, ngram_size=None, lemmatize=False, stemmer=None):
+def lookup_text(text, keywords_file=None, stopwords_file=None, ngram_size=None,
+                lemmatize=False, stemmer=None, scorer=None):
     # pylint: disable=too-many-arguments
     """Perform keywords lookup on a plain text.
 
@@ -144,6 +156,8 @@ def lookup_text(text, keywords_file=None, stopwords_file=None, ngram_size=None, 
     :type lemmatize: bool
     :param stemmer: stemmer to be used
     :type stemmer: str
+    :param scorer: scorer to be used
+    :type scorer: f8a_tagger.scoring.Scoring
     :return: found keywords
     """
     ngram_size, tokenizer, chief, core_parser = _prepare_lookup(keywords_file,
@@ -153,7 +167,7 @@ def lookup_text(text, keywords_file=None, stopwords_file=None, ngram_size=None, 
                                                                 stemmer)
     if not isinstance(text, str):
         raise InvalidInputError("Invalid text passed '%s' (type: %s), should be string" % (text, type(text)))
-    return _perform_lookup(core_parser.parse(text, 'txt'), tokenizer, chief)
+    return _perform_lookup(core_parser.parse(text, 'txt'), tokenizer, chief, scorer)
 
 
 def collect(collector=None, ignore_errors=False, use_progressbar=False):
@@ -263,3 +277,8 @@ def get_registered_collectors():
 def get_registered_stemmers():
     """Get all stemmers that are available in NLTK."""
     return Stemmer.get_registered_stemmers()
+
+
+def get_registered_scorers():
+    """Get all keyword scorers that are supported."""
+    return Scoring.get_registered_scorers()

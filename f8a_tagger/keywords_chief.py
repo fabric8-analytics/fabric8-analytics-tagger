@@ -38,6 +38,7 @@ class KeywordsChief(object):
             raise InvalidInputError("Unknown keyword file provided - %s" % (type(keyword_file)))
 
         self._keywords = anymarkup.parse(content)
+        self._keywords_prop = None
         del content
 
         # make sure keywords are strings
@@ -46,10 +47,13 @@ class KeywordsChief(object):
         # add missing default values
         for keyword in self._keywords.keys():
             if self._keywords[keyword] is None:
-                self._keywords[keyword] = {'synonyms': [], 'regexp': []}
+                self._keywords[keyword] = {'synonyms': [], 'regexp': [], 'occurrence_count': 1}
 
             if self._keywords[keyword].get('synonyms') is None:
                 self._keywords[keyword]['synonyms'] = []
+
+            if self._keywords[keyword].get('occurrence_count') is None:
+                self._keywords[keyword]['occurrence_count'] = 1
 
             # make sure synonyms are strings
             self._keywords[keyword]['synonyms'] = list(map(str, self._keywords[keyword]['synonyms']))
@@ -80,24 +84,37 @@ class KeywordsChief(object):
     @property
     def keywords(self):
         """Get keywords used by keywords chief instance."""
-        ret = {}
+        if self._keywords_prop is None:
+            self._keywords_prop = {}
 
-        for keyword in self._keywords.keys():
-            for conf in self._keywords[keyword].keys():
-                if not self._keywords[keyword][conf]:
-                    continue
+            for keyword in self._keywords.keys():
+                for conf in self._keywords[keyword].keys():
+                    if not self._keywords[keyword][conf]:
+                        continue
 
-                if keyword not in ret:
-                    ret[keyword] = {}
+                    if keyword not in self._keywords_prop:
+                        self._keywords_prop[keyword] = {}
 
-                if conf == 'regexp':
-                    ret[keyword]['regexp'] = []
-                    for regexp in self._keywords[keyword]['regexp']:
-                        ret[keyword]['regexp'].append(regexp.pattern)
-                else:
-                    ret[keyword][conf] = self._keywords[keyword][conf]
+                    if conf == 'regexp':
+                        self._keywords_prop[keyword]['regexp'] = []
+                        for regexp in self._keywords[keyword]['regexp']:
+                            self._keywords_prop[keyword]['regexp'].append(regexp.pattern)
+                    else:
+                        self._keywords_prop[keyword][conf] = self._keywords[keyword][conf]
 
-        return ret
+        return self._keywords_prop
+
+    def get_keywords_count(self):
+        """Get number of keywords registered."""
+        return len(self.keywords.keys())
+
+    def get_average_occurrence_count(self):
+        """Get average keyword occurrence count."""
+        usage = 0
+        for value in self.keywords.values():
+            usage += value['occurrence_count']
+
+        return usage / self.get_keywords_count()
 
     def compute_ngram_size(self):
         """Compute ngram size based on keywords configuration.
@@ -155,17 +172,17 @@ class KeywordsChief(object):
         """Extract all keywords.
 
         :param tokens: tokens for which keywords should be gathered.
-        :return: a list of keywords that were found
-        :rtype: list
+        :return: dictionary of keywords with they occurrence count
+        :rtype: dict
         """
-        keywords = set()
+        keywords = dict()
 
         for token in tokens:
             keyword = self.get_keyword(token)
             if keyword:
-                keywords.add(keyword)
+                keywords[keyword] = keywords.get(keyword, 0) + 1
 
-        return list(keywords)
+        return keywords
 
     @staticmethod
     def filter_keyword(keyword):
