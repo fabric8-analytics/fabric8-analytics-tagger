@@ -2,10 +2,12 @@
 """Keywords extraction/tagging for fabric8-analytics."""
 
 from itertools import chain
+import os
 
 import anymarkup
 import daiquiri
 from f8a_tagger.collectors import CollectorBase
+import f8a_tagger.defaults as defaults
 from f8a_tagger.errors import InvalidInputError
 from f8a_tagger.keywords_chief import KeywordsChief
 from f8a_tagger.keywords_set import KeywordsSet
@@ -91,18 +93,26 @@ def lookup_file(path, keywords_file=None, stopwords_file=None,
                                                                 ngram_size,
                                                                 lemmatize,
                                                                 stemmer)
-    for file in progressbarize(iter_files(path, ignore_errors), progress=use_progressbar):
-        _logger.info("Processing file '%s'", file)
+    for project, file in progressbarize(iter_files(path, ignore_errors), progress=use_progressbar):
+        file_name = file
+        if not isinstance(file, str):
+            file_name = file.name
+        _logger.info("Processing file '%s' for project '%s'", file_name, project)
         try:
-            content = core_parser.parse_file(file)
+            content = core_parser.parse_file(file_name)
             keywords = _perform_lookup(content, tokenizer, chief, scorer)
         except Exception as exc:  # pylint: disable=broad-except
             if not ignore_errors:
                 raise
-            _logger.exception("Failed to parse content in file '%s': %s", file, str(exc))
+            _logger.exception("Failed to parse content in file '%s': %s", file_name, str(exc))
             continue
+        finally:
+            # Remove temporary file here so we can use safely progressbar
+            if not isinstance(file, str):
+                _logger.debug("Removing temporary file '%s' for project '%s'", file_name, project)
+                os.remove(file_name)
 
-        ret[file] = keywords
+        ret[project] = keywords
 
     return ret
 

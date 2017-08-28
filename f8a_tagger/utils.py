@@ -4,11 +4,33 @@
 from collections import deque
 import json
 import os
+import tempfile
+
+import requests
 
 import daiquiri
+from f8a_tagger.errors import RemoteResourceMissingError
 import progressbar
 
 _logger = daiquiri.getLogger(__name__)
+
+
+def _get_remote_resource(item):
+    """Get remote resource (e.g. README file).
+
+    :param item: remote resource location
+    :return: tuple - content and content extension based on content type
+    """
+    response = requests.get(item)
+    if response.status_code != 200:
+        raise RemoteResourceMissingError("Server returned HTTP status code: %d"
+                                         % response.status_code)
+    parts = item.rsplit('.', 1)
+    if len(parts) > 2:
+        return response.text, '.' + parts[-1]
+
+    # Use HTML parser by default
+    return response.text, '.html'
 
 
 def iter_files(path, ignore_errors=True):
@@ -24,10 +46,24 @@ def iter_files(path, ignore_errors=True):
         item = stack.pop()
 
         if os.path.isfile(item):
-            yield item
+            yield item, item
         elif os.path.isdir(item):
             for entry in os.listdir(item):
                 stack.append(os.path.join(item, entry))
+        elif item.startswith(('http://', 'https://')):
+            try:
+                content, suffix = _get_remote_resource(item)
+                temp_file = tempfile.NamedTemporaryFile(mode='w+t', delete=False, suffix=suffix)
+                temp_file.write(content)
+                temp_file.close()
+            except Exception as exc:  # pylint: disable=broad-except
+                error_msg = "Failed to retrieve remote file for '%s': %s" % (item, str(exc))
+                if not ignore_errors:
+                    raise RuntimeError(error_msg) from exc
+
+                _logger.warning(error_msg)
+                continue
+            yield item, temp_file
         else:
             if not ignore_errors:
                 raise ValueError("Not a directory nor file '%s'" % item)
