@@ -8,3 +8,7 @@ class StemmerNotFoundError(Exception):
 
 class InvalidInputError(Exception):
     """Raised if bad input is provided."""
+
+
+class RemoteResourceMissingError(Exception):
+    """Raised when remote resource (e.g. README) is not found."""

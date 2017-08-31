@@ -40,6 +40,20 @@ class MarkdownParser(AbstractParser):  # pylint: disable=too-few-public-methods
         return BeautifulSoup(markdown2.markdown(content), 'lxml').get_text()
 
 
+class HtmlParser(AbstractParser):  # pylint: disable=too-few-public-methods
+    """HTML parser."""
+
+    def parse(self, content):
+        """Parse content to raw text.
+
+        :param content: content to parse
+        :type content: str
+        :return: raw/plain content representation
+        :rtype: str
+        """
+        return BeautifulSoup(content, 'lxml').get_text()
+
+
 class ReStructuredTextParser(AbstractParser):  # pylint: disable=too-few-public-methods
     """ReStructuredText parser."""
 

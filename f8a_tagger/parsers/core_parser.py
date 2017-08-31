@@ -7,6 +7,7 @@ import simplejson as json
 
 from .parsers import AsciidocParser
 from .parsers import CreoleParser
+from .parsers import HtmlParser
 from .parsers import MarkdownParser
 from .parsers import MediawikiParser
 from .parsers import OrgParser
@@ -32,7 +33,8 @@ class CoreParser(object):
         'rdoc': RdocParser,
         'restructuredtext': ReStructuredTextParser,
         'textile': TextileParser,
-        'txt': TextParser
+        'txt': TextParser,
+        'html': HtmlParser
     }
 
     # based on https://github.com/github/markup#markups
@@ -53,7 +55,8 @@ class CoreParser(object):
         '.rst': 'restructuredtext',
         '.textile': 'textile',
         '.txt': 'txt',
-        '.wiki': 'mediawiki'
+        '.wiki': 'mediawiki',
+        '.html': 'html'
     }
 
     def parse(self, content, content_type, **parser_kwargs):

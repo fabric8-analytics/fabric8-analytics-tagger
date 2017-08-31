@@ -53,7 +53,7 @@ def cli(verbose=0):
 
 
 @cli.command('lookup')
-@click.argument('path', type=click.Path(exists=True, file_okay=True, dir_okay=True))
+@click.argument('path', type=click.Path())
 @click.option('-o', '--output-file',
               help='Output file with found keywords.')
 @click.option('--keywords-file', type=click.Path(exists=True, file_okay=True, dir_okay=False),
