@@ -14,11 +14,12 @@ class KeywordsSet(object):
         """Get stored keywords."""
         return self._keywords_set
 
-    def add(self, keyword):
+    def add(self, keyword, occurrence_count=1):
         """Add a keyword to set (count additions)."""
         if keyword not in self._keywords_set:
             self._keywords_set[keyword] = {}
-        self._keywords_set[keyword]['occurrence_count'] = self._keywords_set[keyword].get('occurrence_count', 0) + 1
+        self._keywords_set[keyword]['occurrence_count'] = \
+            self._keywords_set[keyword].get('occurrence_count', 0) + occurrence_count
 
     def union(self, other):
         """Perform union on two keywords set.
