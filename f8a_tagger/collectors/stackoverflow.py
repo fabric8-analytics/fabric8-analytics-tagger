@@ -34,9 +34,17 @@ class StackOverflowCollector(CollectorBase):
             for entry in archive:
                 if entry.name == 'Tags.xml':
                     tags = xmltodict.parse(b"".join(entry.get_blocks()))
+                    break
 
         for tag in tags['tags']['row']:
-            keywords_set.add(tag['@TagName'], int(tag['@Count']))
+            try:
+                keywords_set.add(tag['@TagName'], int(tag['@Count']))
+            except ValueError:
+                _logger.warning("Failed to parse number of occurrences for tag %s", tag['@TagName'])
+                continue
+            except KeyError:
+                _logger.exception("Missing tagname or tag count")
+                continue
 
         return keywords_set
 
