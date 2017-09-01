@@ -4,3 +4,5 @@ f8a_tagger/parsers/__pycache__/
 *.orig
 venv/
 venv-coala/
+build/
+f8a_tagger.egg-info/
