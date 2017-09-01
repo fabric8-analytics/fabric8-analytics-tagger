@@ -9,4 +9,6 @@ pygments
 progressbar2
 anymarkup
 requests
+libarchive-c
+xmltodict
 lxml
