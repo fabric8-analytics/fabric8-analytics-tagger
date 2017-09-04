@@ -34,7 +34,9 @@ class CoreParser(object):
         'restructuredtext': ReStructuredTextParser,
         'textile': TextileParser,
         'txt': TextParser,
-        'html': HtmlParser
+        'html': HtmlParser,
+        # fallback to raw text when unknown format provided
+        'unknown': TextParser
     }
 
     # based on https://github.com/github/markup#markups
