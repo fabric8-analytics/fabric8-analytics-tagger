@@ -5,7 +5,6 @@ import requests
 
 import daiquiri
 from f8a_tagger.keywords_set import KeywordsSet
-import libarchive
 import xmltodict
 
 from .base import CollectorBase
@@ -20,6 +19,8 @@ class StackOverflowCollector(CollectorBase):
 
     def execute(self, ignore_errors=True, use_progressbar=False):
         """Collect PyPI keywords."""
+        # TODO: fix https://github.com/fabric8-analytics/fabric8-analytics-tagger/issues/34
+        import libarchive
         keywords_set = KeywordsSet()
         _logger.debug("Fetching StackOverflow")
 
