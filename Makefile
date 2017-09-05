@@ -9,6 +9,8 @@ TEMPFILE := $(shell mktemp -u)
 install:
 	pip3 install -r requirements.txt
 	python3 setup.py install
+	@echo "Preparing tagger..."
+	python3 -c 'import f8a_tagger; f8a_tagger.prepare()'
 
 venv:
 	virtualenv -p python3 venv && source venv/bin/activate && pip3 install -r requirements.txt

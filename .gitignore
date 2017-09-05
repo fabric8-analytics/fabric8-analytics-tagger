@@ -6,3 +6,4 @@ venv/
 venv-coala/
 build/
 f8a_tagger.egg-info/
+dist/

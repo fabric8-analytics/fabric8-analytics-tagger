@@ -19,3 +19,10 @@ from .recipes import lookup_readme
 from .recipes import lookup_text
 from .recipes import reckon
 from .tokenizer import Tokenizer
+
+
+def prepare():
+    """Prepare tagger for run - this should be after installation to initialize tagger's resources."""
+    import nltk
+    nltk.download("punkt")
+    nltk.download("wordnet")
