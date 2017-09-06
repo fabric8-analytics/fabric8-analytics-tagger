@@ -2,7 +2,8 @@
 """Maven keywords collector."""
 
 from json import loads
-from os import chdir, path
+from os import chdir
+from os import path
 from pathlib import Path
 from subprocess import check_output
 
