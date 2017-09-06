@@ -2,8 +2,11 @@
 """Utilities for fabric8-analytics tagger."""
 
 from collections import deque
+from contextlib import contextmanager
 import json
 import os
+from os import chdir
+from os import getcwd
 import tempfile
 
 import requests
@@ -105,3 +108,14 @@ def progressbarize(iterable, progress=False):
         ])(list(iterable))
 
     return iterable
+
+
+@contextmanager
+def cwd(target):
+    """Manage cwd in a pushd/popd fashion."""
+    curdir = getcwd()
+    chdir(target)
+    try:
+        yield
+    finally:
+        chdir(curdir)
