@@ -25,21 +25,22 @@ from .tokenizer import Tokenizer
 def prepare():
     """Prepare tagger for run - this should be after installation to initialize tagger's resources."""
     import nltk
-    nltk.download("punkt")
-    nltk.download("wordnet")
-
     import requests
     from libarchive import extract_memory
     from pathlib import Path
     import os
     from shutil import move
 
+    nltk.download("punkt")
+    nltk.download("wordnet")
+
     maven_index_checker_url = 'https://github.com/fabric8-analytics/' \
                               'maven-index-checker/files/1275145/' \
                               'maven-index-checker-v0.1-alpha.zip'
     response = requests.get(maven_index_checker_url)
     if response.ok is not True:
-        raise RemoteDependencyMissingError("Failed to download maven-index-checker")
+        raise RemoteDependencyMissingError("Failed to download maven-index-checker with response code %s",
+                                           response.status_code)
 
     # Unfortunately no way how to know name or path of extracted file,
     # so assume it's maven-index-checker.jar
@@ -48,5 +49,4 @@ def prepare():
     if not os.path.exists(jar_path):
         os.makedirs(jar_path)
     extract_memory(response.content)
-
     move(jar_name, os.path.join(jar_path, jar_name))
