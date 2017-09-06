@@ -8,6 +8,7 @@ __license__ = 'ASL 2.0'
 __copyright__ = 'Copyright 2017 Fridolin Pokorny'
 
 from .corpus import Corpus
+from .errors import RemoteDependencyMissingError
 from .keywords_chief import KeywordsChief
 from .recipes import aggregate
 from .recipes import collect
@@ -26,3 +27,26 @@ def prepare():
     import nltk
     nltk.download("punkt")
     nltk.download("wordnet")
+
+    import requests
+    from libarchive import extract_memory
+    from pathlib import Path
+    import os
+    from shutil import move
+
+    maven_index_checker_url = 'https://github.com/fabric8-analytics/' \
+                              'maven-index-checker/files/1275145/' \
+                              'maven-index-checker-v0.1-alpha.zip'
+    response = requests.get(maven_index_checker_url)
+    if response.ok is not True:
+        raise RemoteDependencyMissingError("Failed to download maven-index-checker")
+
+    # Unfortunately no way how to know name or path of extracted file,
+    # so assume it's maven-index-checker.jar
+    jar_name = "maven-index-checker.jar"
+    jar_path = os.path.join(Path.home(), ".fabric8-analytics-tagger")
+    if not os.path.exists(jar_path):
+        os.makedirs(jar_path)
+    extract_memory(response.content)
+
+    move(jar_name, os.path.join(jar_path, jar_name))

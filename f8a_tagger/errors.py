@@ -12,3 +12,7 @@ class InvalidInputError(Exception):
 
 class RemoteResourceMissingError(Exception):
     """Raised when remote resource (e.g. README) is not found."""
+
+
+class RemoteDependencyMissingError(Exception):
+    """Raise when remote dependency (e.g. maven-index-checker) is not found."""
