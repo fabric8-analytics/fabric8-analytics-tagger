@@ -41,15 +41,16 @@ class MavenCollector(CollectorBase):
         packages = [dict(s) for s in set(frozenset(d.items()) for d in packages)]
 
         _logger.debug("started fetching data from mvnrepository.com")
-        for package in progressbarize(packages, use_progressbar):
-            response = get(self._MVNREPOSITORY_URL + package['groupId'] + '/' + package['artifactId'])
-            soup = BeautifulSoup(response.text, 'lxml')
-            for i in soup.find_all(class_="b tag"):
-                keywords_set.add(i.text)
-
-        # Clean unpacked maven index after executing
-        _logger.debug("Cleaning unpacked maven index")
-        rmtree(path.join(maven_index_checker_dir, "target"))
+        try:
+            for package in progressbarize(packages, use_progressbar):
+                response = get(self._MVNREPOSITORY_URL + package['groupId'] + '/' + package['artifactId'])
+                soup = BeautifulSoup(response.text, 'lxml')
+                for i in soup.find_all(class_="b tag"):
+                    keywords_set.add(i.text)
+        finally:
+            # Clean unpacked maven index after executing
+            _logger.debug("Cleaning unpacked maven index")
+            rmtree(path.join(maven_index_checker_dir, "target"))
 
         return keywords_set
 
