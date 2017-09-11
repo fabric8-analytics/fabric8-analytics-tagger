@@ -86,7 +86,13 @@ class RelativeUsageScoring(Scoring):
         # pylint: disable=invalid-name
         x = ((keyword_occurrence_count + total_keyword_occurrence_count) / keywords_avg_occurrence_count)\
             - total_average_occurrence_count
-        res = 1 / (1 + math.exp(-x))
+        try:
+            res = 1 / (1 + math.exp(-x))
+        except OverflowError:
+            if x > 0:
+                return 1.0
+            else:
+                return 0.0
         _logger.debug("sigmoid(%g) = %g", -x, res)
         return res
 
