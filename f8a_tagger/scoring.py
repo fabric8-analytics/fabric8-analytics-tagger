@@ -91,8 +91,7 @@ class RelativeUsageScoring(Scoring):
         except OverflowError:
             if x > 0:
                 return 1.0
-            else:
-                return 0.0
+            return 0.0
         _logger.debug("sigmoid(%g) = %g", -x, res)
         return res
 

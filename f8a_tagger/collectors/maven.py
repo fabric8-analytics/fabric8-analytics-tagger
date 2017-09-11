@@ -3,7 +3,6 @@
 
 from json import loads
 from os import path
-from pathlib import Path
 from shutil import rmtree
 from subprocess import check_output
 
@@ -13,6 +12,7 @@ from bs4 import BeautifulSoup
 import daiquiri
 from f8a_tagger.keywords_set import KeywordsSet
 from f8a_tagger.utils import cwd
+from f8a_tagger.utils import get_files_dir
 from f8a_tagger.utils import progressbarize
 
 from .base import CollectorBase
@@ -30,7 +30,7 @@ class MavenCollector(CollectorBase):
         keywords_set = KeywordsSet()
 
         _logger.debug("Fetching Maven and executing Maven index checker")
-        maven_index_checker_dir = path.join(Path.home(), ".fabric8-analytics-tagger")
+        maven_index_checker_dir = get_files_dir()
         with cwd(maven_index_checker_dir):
             # This requires at least  4GB of free space on /tmp partition
             packages = loads(check_output(

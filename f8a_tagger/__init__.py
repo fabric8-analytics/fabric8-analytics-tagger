@@ -27,9 +27,9 @@ def prepare():
     import nltk
     import requests
     from libarchive import extract_memory
-    from pathlib import Path
     import os
     from shutil import move
+    from f8a_tagger.utils import get_files_dir
 
     nltk.download("punkt")
     nltk.download("wordnet")
@@ -45,8 +45,7 @@ def prepare():
     # Unfortunately no way how to know name or path of extracted file,
     # so assume it's maven-index-checker.jar
     jar_name = "maven-index-checker.jar"
-    jar_path = os.path.join(Path.home(), ".fabric8-analytics-tagger")
-    if not os.path.exists(jar_path):
-        os.makedirs(jar_path)
+
+    jar_path = get_files_dir()
     extract_memory(response.content)
     move(jar_name, os.path.join(jar_path, jar_name))
