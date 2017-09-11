@@ -7,6 +7,7 @@ import json
 import os
 from os import chdir
 from os import getcwd
+from pathlib import Path
 import tempfile
 
 import requests
@@ -119,3 +120,17 @@ def cwd(target):
         yield
     finally:
         chdir(curdir)
+
+
+def get_files_dir():
+    """Get directory for config and remote files."""
+    try:
+        home = Path.home()
+    except AttributeError:
+        # Fix for older Python version were Path has no 'home' attribute
+        home = os.getenv('HOME', '/tmp/')  # Ignore B108
+    files_dir = os.path.join(home, '.fabric8-analytics-tagger')
+    if not os.path.exists(files_dir):
+        os.makedirs(files_dir)
+
+    return files_dir
