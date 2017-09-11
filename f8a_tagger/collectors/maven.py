@@ -49,7 +49,7 @@ class MavenCollector(CollectorBase):
                     error_msg = "Failed to retrieve package information for '{}', response status code: {}". \
                         format(package_name, response.status_code)
                     if ignore_errors:
-                        _logger.error()
+                        _logger.error(error_msg)
                         continue
                     raise RuntimeError(error_msg)
 
