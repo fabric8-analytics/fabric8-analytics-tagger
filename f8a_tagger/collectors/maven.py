@@ -43,7 +43,16 @@ class MavenCollector(CollectorBase):
         _logger.debug("started fetching data from mvnrepository.com")
         try:
             for package in progressbarize(packages, use_progressbar):
-                response = get(self._MVNREPOSITORY_URL + package['groupId'] + '/' + package['artifactId'])
+                package_name = package['groupId'] + '/' + package['artifactId']
+                response = get(self._MVNREPOSITORY_URL + package_name)
+                if response.ok is not True:
+                    error_msg = "Failed to retrieve package information for '{}', response status code: {}". \
+                        format(package_name, response.status_code)
+                    if ignore_errors:
+                        _logger.error(error_msg)
+                        continue
+                    raise RuntimeError(error_msg)
+
                 soup = BeautifulSoup(response.text, 'lxml')
                 for i in soup.find_all(class_="b tag"):
                     keywords_set.add(i.text)
