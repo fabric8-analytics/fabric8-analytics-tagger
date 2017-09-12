@@ -5,6 +5,7 @@ from json import loads
 from os import path
 from shutil import rmtree
 from subprocess import check_output
+from time import sleep
 
 from requests import get
 
@@ -56,6 +57,10 @@ class MavenCollector(CollectorBase):
                 soup = BeautifulSoup(response.text, 'lxml')
                 for i in soup.find_all(class_="b tag"):
                     keywords_set.add(i.text)
+
+                # It seems that mvnrepository has limit for 2000 requests per hour
+                # so sleeping 2 seconds of sleep should do the trick
+                sleep(2)
         finally:
             # Clean unpacked maven index after executing
             _logger.debug("Cleaning unpacked maven index")
