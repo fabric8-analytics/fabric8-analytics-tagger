@@ -9,6 +9,7 @@ import nltk
 
 import daiquiri
 import f8a_tagger.defaults as defaults
+from f8a_tagger.errors import InstallPrepareError
 from f8a_tagger.errors import InvalidInputError
 
 _logger = daiquiri.getLogger(__name__)
@@ -141,7 +142,10 @@ class Tokenizer(object):
         :type remove_stopwords: bool
         :return: tokenized content
         """
-        sentences = nltk.sent_tokenize(content)
+        try:
+            sentences = nltk.sent_tokenize(content)
+        except LookupError as exc:
+            raise InstallPrepareError("NLTK not initialized, did you run prepare() after installation?") from exc
 
         for idx, sentence in enumerate(sentences):
             sentences[idx] = [token.lower() for token in nltk.word_tokenize(sentence)]

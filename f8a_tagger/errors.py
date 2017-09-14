@@ -15,4 +15,8 @@ class RemoteResourceMissingError(Exception):
 
 
 class RemoteDependencyMissingError(Exception):
-    """Raise when remote dependency (e.g. maven-index-checker) is not found."""
+    """Raised when remote dependency (e.g. maven-index-checker) is not found."""
+
+
+class InstallPrepareError(Exception):
+    """Raised when prepare() was not called after installation."""

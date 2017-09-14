@@ -11,6 +11,7 @@ from requests import get
 
 from bs4 import BeautifulSoup
 import daiquiri
+from f8a_tagger.errors import InstallPrepareError
 from f8a_tagger.keywords_set import KeywordsSet
 from f8a_tagger.utils import cwd
 from f8a_tagger.utils import get_files_dir
@@ -32,10 +33,16 @@ class MavenCollector(CollectorBase):
 
         _logger.debug("Fetching Maven and executing Maven index checker")
         maven_index_checker_dir = get_files_dir()
+        maven_index_checker_jar = path.join(maven_index_checker_dir, "maven-index-checker.jar")
+
+        if not path.isfile(maven_index_checker_jar):
+            raise InstallPrepareError("Maven index checker was not found in '%s', did you forget to run prepare()?"
+                                      % maven_index_checker_jar)
+
         with cwd(maven_index_checker_dir):
             # This requires at least  4GB of free space on /tmp partition
             packages = loads(check_output(
-                ['java', '-jar', path.join(maven_index_checker_dir, "maven-index-checker.jar"), '-it']))
+                ['java', '-jar', maven_index_checker_jar, '-it']))
 
         for package in packages:
             del package['version']
