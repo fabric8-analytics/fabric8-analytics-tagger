@@ -23,7 +23,8 @@ from .tokenizer import Tokenizer
 
 
 def prepare():
-    """Prepare tagger for run - this should be after installation to initialize tagger's resources."""
+    """Prepare tagger for run - this should be after installation to initialize
+    tagger's resources."""
     import nltk
     import requests
     from libarchive import extract_memory
@@ -39,7 +40,8 @@ def prepare():
                               'maven-index-checker-v0.1-alpha.zip'
     response = requests.get(maven_index_checker_url)
     if response.ok is not True:
-        raise RemoteDependencyMissingError("Failed to download maven-index-checker with response code %s",
+        raise RemoteDependencyMissingError("Failed to download maven-index-checker with "
+                                           "response code %s",
                                            response.status_code)
 
     # Unfortunately no way how to know name or path of extracted file,

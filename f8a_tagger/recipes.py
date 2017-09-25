@@ -22,7 +22,8 @@ from f8a_tagger.utils import progressbarize
 _logger = daiquiri.getLogger(__name__)
 
 
-def _prepare_lookup(keywords_file=None, stopwords_file=None, ngram_size=None, lemmatize=False, stemmer=None):
+def _prepare_lookup(keywords_file=None, stopwords_file=None, ngram_size=None, lemmatize=False,
+                    stemmer=None):
     # pylint: disable=too-many-arguments
     """Prepare resources for keywords lookup.
 
@@ -45,7 +46,8 @@ def _prepare_lookup(keywords_file=None, stopwords_file=None, ngram_size=None, le
     elif ngram_size is None:
         ngram_size = computed_ngram_size
 
-    tokenizer = Tokenizer(stopwords_file, ngram_size, lemmatizer=lemmatizer_instance, stemmer=stemmer_instance)
+    tokenizer = Tokenizer(stopwords_file, ngram_size, lemmatizer=lemmatizer_instance,
+                          stemmer=stemmer_instance)
 
     return ngram_size, tokenizer, chief, CoreParser()
 
@@ -60,7 +62,8 @@ def _perform_lookup(content, tokenizer, chief, scorer):
     :type scorer: str
     """
     tokens = tokenizer.tokenize(content)
-    # We do not perform any analysis on sentences now, so treat all tokens as one array (sentences of tokens).
+    # We do not perform any analysis on sentences now, so treat all tokens as
+    # one array (sentences of tokens).
     tokens = chain(*tokens)
     keywords = chief.extract_keywords(tokens)
     scorer = Scoring.get_scoring(scorer or defaults.DEFAULT_SCORER)
@@ -176,7 +179,8 @@ def lookup_text(text, keywords_file=None, stopwords_file=None, ngram_size=None,
                                                                 lemmatize,
                                                                 stemmer)
     if not isinstance(text, str):
-        raise InvalidInputError("Invalid text passed '%s' (type: %s), should be string" % (text, type(text)))
+        raise InvalidInputError("Invalid text passed '%s' (type: %s), should be string" %
+                                (text, type(text)))
     return _perform_lookup(core_parser.parse(text, 'txt'), tokenizer, chief, scorer)
 
 
@@ -189,7 +193,7 @@ def collect(collector=None, ignore_errors=False, use_progressbar=False):
     :return: all collected keywords
     """
     keywords_set = KeywordsSet()
-    for col in (collector or CollectorBase.get_registered_collectors()):  # pylint: disable=superfluous-parens
+    for col in (collector or CollectorBase.get_registered_collectors()):  # pylint: disable=superfluous-parens # noqa
         try:
             collector_instance = CollectorBase.get_collector_class(col)()
             keywords_set.union(collector_instance.execute(ignore_errors, use_progressbar))
@@ -202,7 +206,7 @@ def collect(collector=None, ignore_errors=False, use_progressbar=False):
     return keywords_set.keywords
 
 
-def aggregate(input_keywords_file, no_synonyms=None, use_progressbar=False, occurrence_count_filter=None):  # pylint: disable=too-many-branches
+def aggregate(input_keywords_file, no_synonyms=None, use_progressbar=False, occurrence_count_filter=None):  # pylint: disable=too-many-branches # noqa
     """Aggregate available topics.
 
     :param input_keywords_file: a list/tuple of input keywords files to process
@@ -223,12 +227,15 @@ def aggregate(input_keywords_file, no_synonyms=None, use_progressbar=False, occu
             keyword = str(keyword)
 
             if not KeywordsChief.matches_keyword_pattern(keyword):
-                _logger.debug("Dropping keyword '%s' as it does not match keyword pattern.", keyword)
+                _logger.debug("Dropping keyword '%s' as it does not match keyword pattern.",
+                              keyword)
                 continue
 
-            if keyword in all_keywords.keys() and value is not None and all_keywords[keyword] is not None:
-                all_keywords[keyword]['occurrence_count'] = value.pop('occurrence_count', 0) +\
-                                                            all_keywords[keyword].get('occurrence_count', 0)
+            if keyword in all_keywords.keys() and value is not None and \
+               all_keywords[keyword] is not None:
+                all_keywords[keyword]['occurrence_count'] = \
+                    value.pop('occurrence_count', 0) + \
+                    all_keywords[keyword].get('occurrence_count', 0)
                 for conf, items in value.items():
                     all_keywords[keyword][str(conf)] = list(
                         set(items or []) | set(all_keywords[keyword][str(conf)] or []))

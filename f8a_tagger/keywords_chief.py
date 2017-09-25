@@ -16,10 +16,11 @@ _logger = daiquiri.getLogger(__name__)
 class KeywordsChief(object):
     """Keeping and interacting with keywords."""
 
-    _DEFAULT_KEYWORD_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data', 'keywords.yaml')
+    _DEFAULT_KEYWORD_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data',
+                                              'keywords.yaml')
     _KEYWORD_PATTERN = re.compile('[0-9a-zA-Z][0-9a-zA-Z-_.]*')
 
-    def __init__(self, keyword_file=None, lemmatizer=False, stemmer=None):  # pylint: disable=too-many-branches
+    def __init__(self, keyword_file=None, lemmatizer=False, stemmer=None):  # pylint: disable=too-many-branches # noqa
         """Construct.
 
         :param keyword_file: a path to keyword file
@@ -56,7 +57,8 @@ class KeywordsChief(object):
                 self._keywords[keyword]['occurrence_count'] = 1
 
             # make sure synonyms are strings
-            self._keywords[keyword]['synonyms'] = list(map(str, self._keywords[keyword]['synonyms']))
+            self._keywords[keyword]['synonyms'] = \
+                list(map(str, self._keywords[keyword]['synonyms']))
 
             if self._keywords[keyword].get('regexp') is None:
                 self._keywords[keyword]['regexp'] = []
@@ -77,7 +79,8 @@ class KeywordsChief(object):
                     new_synonym = delim.join(synonyms)
 
                     if new_synonym != synonym:
-                        _logger.debug("Stemmed and lemmatized keyword synonym from '%s' to '%s' for keyword '%s'",
+                        _logger.debug("Stemmed and lemmatized keyword synonym from '%s' to '%s' "
+                                      "for keyword '%s'",
                                       synonym, new_synonym, keyword)
                         entry['synonyms'][idx] = new_synonym
 
@@ -163,7 +166,8 @@ class KeywordsChief(object):
 
             for regexp in (entry.get('regexp') or []):  # pylint: disable=superfluous-parens
                 if re.fullmatch(regexp, token):
-                    _logger.debug("Found keyword '%s' based regexp match '%s' for '%s'", keyword, regexp.pattern, token)
+                    _logger.debug("Found keyword '%s' based regexp match '%s' for '%s'", keyword,
+                                  regexp.pattern, token)
                     return keyword
 
         return None

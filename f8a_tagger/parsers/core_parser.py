@@ -77,7 +77,8 @@ class CoreParser(object):
         if not content:
             raise ValueError("No content to parse")
 
-        _logger.debug("Using parser '%s' for content type '%s'", parser_class.__name__, content_type)
+        _logger.debug("Using parser '%s' for content type '%s'",
+                      parser_class.__name__, content_type)
         parser = parser_class(**parser_kwargs)
 
         return parser.parse(content)

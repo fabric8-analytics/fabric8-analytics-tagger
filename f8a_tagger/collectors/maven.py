@@ -36,7 +36,8 @@ class MavenCollector(CollectorBase):
         maven_index_checker_jar = path.join(maven_index_checker_dir, "maven-index-checker.jar")
 
         if not path.isfile(maven_index_checker_jar):
-            raise InstallPrepareError("Maven index checker was not found in '%s', did you forget to run prepare()?"
+            raise InstallPrepareError("Maven index checker was not found in '%s', did you forget "
+                                      "to run prepare()?"
                                       % maven_index_checker_jar)
 
         with cwd(maven_index_checker_dir):
@@ -54,7 +55,8 @@ class MavenCollector(CollectorBase):
                 package_name = package['groupId'] + '/' + package['artifactId']
                 response = get(self._MVNREPOSITORY_URL + package_name)
                 if response.ok is not True:
-                    error_msg = "Failed to retrieve package information for '{}', response status code: {}". \
+                    error_msg = "Failed to retrieve package information for '{}', " \
+                                "response status code: {}". \
                         format(package_name, response.status_code)
                     if ignore_errors:
                         _logger.error(error_msg)

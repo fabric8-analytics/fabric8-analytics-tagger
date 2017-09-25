@@ -34,7 +34,8 @@ class PypiCollector(CollectorBase):
             package_name = link.text
             response = requests.get("{}/{}".format(self._PACKAGE_BASE_URL, package_name))
             if response.status_code != 200:
-                error_msg = "Failed to retrieve package information for '{}', response status code: {}".\
+                error_msg = "Failed to retrieve package information for '{}', " \
+                            "response status code: {}".\
                     format(package_name, response.status_code)
                 if ignore_errors:
                     _logger.error(error_msg)

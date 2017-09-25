@@ -73,18 +73,21 @@ class RelativeUsageScoring(Scoring):
     """Relative usage scoring."""
 
     @staticmethod
-    def _scoring_func(total_keyword_occurrence_count, keyword_occurrence_count, keywords_avg_occurrence_count,
-                      total_average_occurrence_count):
+    def _scoring_func(total_keyword_occurrence_count, keyword_occurrence_count,
+                      keywords_avg_occurrence_count, total_average_occurrence_count):
         """Scoring function for relative usage.
 
-        :param total_keyword_occurrence_count: total keyword occurrence count based on keywords.yaml config file
+        :param total_keyword_occurrence_count: total keyword occurrence count
+        based on keywords.yaml config file
         :param keyword_occurrence_count: keyword occurrence count in the given document
         :param keywords_avg_occurrence_count: average occurrence count of found keywords
-        :param total_average_occurrence_count: total average of occurrence count based on keywords.yaml
+        :param total_average_occurrence_count: total average of occurrence
+        count based on keywords.yaml
         :return: computed score
         """
         # pylint: disable=invalid-name
-        x = ((keyword_occurrence_count + total_keyword_occurrence_count) / keywords_avg_occurrence_count)\
+        x = ((keyword_occurrence_count + total_keyword_occurrence_count) /
+             keywords_avg_occurrence_count)\
             - total_average_occurrence_count
         try:
             res = 1 / (1 + math.exp(-x))
