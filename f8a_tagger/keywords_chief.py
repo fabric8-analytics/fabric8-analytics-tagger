@@ -20,7 +20,8 @@ class KeywordsChief(object):
                                               'keywords.yaml')
     _KEYWORD_PATTERN = re.compile('[0-9a-zA-Z][0-9a-zA-Z-_.]*')
 
-    def __init__(self, keyword_file=None, lemmatizer=False, stemmer=None):  # pylint: disable=too-many-branches # noqa
+    def __init__(self, keyword_file=None, lemmatizer=False, stemmer=None):
+        # pylint: disable=too-many-branches
         """Construct.
 
         :param keyword_file: a path to keyword file

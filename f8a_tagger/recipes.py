@@ -193,7 +193,8 @@ def collect(collector=None, ignore_errors=False, use_progressbar=False):
     :return: all collected keywords
     """
     keywords_set = KeywordsSet()
-    for col in (collector or CollectorBase.get_registered_collectors()):  # pylint: disable=superfluous-parens # noqa
+    for col in (collector or CollectorBase.get_registered_collectors()):
+        # pylint: disable=superfluous-parens
         try:
             collector_instance = CollectorBase.get_collector_class(col)()
             keywords_set.union(collector_instance.execute(ignore_errors, use_progressbar))
@@ -206,7 +207,9 @@ def collect(collector=None, ignore_errors=False, use_progressbar=False):
     return keywords_set.keywords
 
 
-def aggregate(input_keywords_file, no_synonyms=None, use_progressbar=False, occurrence_count_filter=None):  # pylint: disable=too-many-branches # noqa
+def aggregate(input_keywords_file, no_synonyms=None, use_progressbar=False,
+              occurrence_count_filter=None):
+    # pylint: disable=too-many-branches
     """Aggregate available topics.
 
     :param input_keywords_file: a list/tuple of input keywords files to process
