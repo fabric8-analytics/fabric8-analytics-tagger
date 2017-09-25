@@ -137,7 +137,8 @@ def cli_aggregate(**kwargs):
               help='Print only changes in keywords.')
 @click.option('-r', '--regexp-only', default=False, is_flag=True,
               help='Print only changes in regular expressions.')
-def cli_diff(keywords1_file_path, keywords2_file_path, synonyms_only=False, keywords_only=False, regexp_only=False):
+def cli_diff(keywords1_file_path, keywords2_file_path, synonyms_only=False, keywords_only=False,
+             regexp_only=False):
     """Compute diff on keyword files."""
     # pylint: disable=too-many-locals
     if synonyms_only and keywords_only:
@@ -147,8 +148,10 @@ def cli_diff(keywords1_file_path, keywords2_file_path, synonyms_only=False, keyw
     keywords2 = anymarkup.parse_file(keywords2_file_path)
     differ = False
 
-    for action, keywords_a, keywords_b, file_path in (('Removed', keywords1, keywords2, keywords1_file_path),
-                                                      ('Added', keywords2, keywords1, keywords2_file_path)):
+    for action, keywords_a, keywords_b, file_path in (('Removed', keywords1, keywords2,
+                                                       keywords1_file_path),
+                                                      ('Added', keywords2, keywords1,
+                                                       keywords2_file_path)):
         for keyword, value in keywords_a.items():
             if not synonyms_only and not regexp_only and keyword not in keywords_b.keys():
                 print("%s keyword '%s' in file '%s'" % (action, keyword, file_path))
@@ -158,13 +161,15 @@ def cli_diff(keywords1_file_path, keywords2_file_path, synonyms_only=False, keyw
             if not keywords_only and not regexp_only and value is not None:
                 for synonym in (value.get('synonyms') or[]):  # pylint: disable=superfluous-parens
                     if synonym not in keywords_b[keyword].get('synonyms', []):
-                        print("%s synonym '%s' for keyword '%s' in file '%s'" % (action, synonym, keyword, file_path))
+                        print("%s synonym '%s' for keyword '%s' in file '%s'" %
+                              (action, synonym, keyword, file_path))
                         differ = True
 
             if not keywords_only and not synonyms_only and value is not None:
                 for regexp in (value.get('regexp') or []):  # pylint: disable=superfluous-parens
                     if regexp not in keywords_b[keyword].get('regexp', []):
-                        print("%s regexp '%s' for keyword '%s' in file '%s'" % (action, regexp, keyword, file_path))
+                        print("%s regexp '%s' for keyword '%s' in file '%s'" %
+                              (action, regexp, keyword, file_path))
                         differ = True
 
     if not differ:

@@ -18,7 +18,8 @@ _logger = daiquiri.getLogger(__name__)
 class Tokenizer(object):
     """Tokenizer for fabric8-analytics."""
 
-    _STOPWORDS_TXT = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data', 'stopwords.txt')
+    _STOPWORDS_TXT = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data',
+                                  'stopwords.txt')
 
     def __init__(self, stopwords_file=None, ngram_size=1, lemmatizer=None, stemmer=None):
         """Construct.
@@ -60,12 +61,14 @@ class Tokenizer(object):
                                     "stopword, missing space after?")
                 self._raw_stopwords.append(word)
 
-        _logger.debug('Registered raw stopwords without lemmatization and stemming: %s', self._raw_stopwords)
+        _logger.debug('Registered raw stopwords without lemmatization and stemming: %s',
+                      self._raw_stopwords)
 
         self._lemmatize(self._raw_stopwords, stopwords=True)
         self._stem(self._raw_stopwords, stopwords=True)
 
-        _logger.debug('Registered raw stopwords with lemmatization and stemming: %s', self._raw_stopwords)
+        _logger.debug('Registered raw stopwords with lemmatization and stemming: %s',
+                      self._raw_stopwords)
 
         _logger.debug('Registered regexp stopwords: %s',
                       [regexp.pattern for regexp in self._regexp_stopwords])
@@ -126,7 +129,8 @@ class Tokenizer(object):
 
             for regexp in self._regexp_stopwords:
                 if re.fullmatch(regexp, token):
-                    _logger.debug("Dropping stopword '%s' based on regexp '%s'", token, regexp.pattern)
+                    _logger.debug("Dropping stopword '%s' based on regexp '%s'", token,
+                                  regexp.pattern)
                     continue
 
             ret.append(token)
@@ -145,7 +149,8 @@ class Tokenizer(object):
         try:
             sentences = nltk.sent_tokenize(content)
         except LookupError as exc:
-            raise InstallPrepareError("NLTK not initialized, did you run prepare() after installation?") from exc
+            raise InstallPrepareError("NLTK not initialized, did you run prepare() after "
+                                      "installation?") from exc
 
         for idx, sentence in enumerate(sentences):
             sentences[idx] = [token.lower() for token in nltk.word_tokenize(sentence)]
@@ -168,7 +173,8 @@ class Tokenizer(object):
 
         for sentence in sentences[:-1]:
             for i in range(1, self._ngram_size):
-                sentences[-1] += [" ".join(ngram) for ngram in zip(*[sentence[j:] for j in range(i + 1)])]
+                sentences[-1] += \
+                    [" ".join(ngram) for ngram in zip(*[sentence[j:] for j in range(i + 1)])]
 
         _logger.debug('Final tokens with ngrams (ngram size: %d): %s', self._ngram_size, sentences)
 

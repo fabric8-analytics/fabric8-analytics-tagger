@@ -30,7 +30,8 @@ class KeywordsSet(object):
         """
         for keyword in other.keywords.keys():
             if keyword in self._keywords_set.keys():
-                self._keywords_set[keyword]['occurrence_count'] = self._keywords_set[keyword].get('occurrence_count', 1)
+                self._keywords_set[keyword]['occurrence_count'] = \
+                    self._keywords_set[keyword].get('occurrence_count', 1)
             else:
                 self._keywords_set[keyword] = other.keywords[keyword]
 
