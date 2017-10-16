@@ -23,8 +23,10 @@ from .tokenizer import Tokenizer
 
 
 def prepare():
-    """Prepare tagger for run - this should be after installation to initialize
-    tagger's resources."""
+    """Prepare tagger for run.
+
+    This should be after installation to initialize tagger's resources.
+    """
     import nltk
     import requests
     from libarchive import extract_memory
