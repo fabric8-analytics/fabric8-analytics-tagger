@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+"""Package configuration module."""
 
 import os
 import sys
@@ -11,6 +12,7 @@ NAME = 'f8a_tagger'
 
 
 def get_requirements():
+    """Read all requirements from the manifest file."""
     with open('requirements.txt') as fd:
         return fd.read().splitlines()
 
