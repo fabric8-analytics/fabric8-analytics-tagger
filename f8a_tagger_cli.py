@@ -44,7 +44,8 @@ def _print_result(result, output_file, fmt=None):
 
 
 @click.group()
-@click.option('-v', '--verbose', count=True, help='Level of verbosity, can be applied multiple times.')
+@click.option('-v', '--verbose', count=True,
+              help='Level of verbosity, can be applied multiple times.')
 def cli(verbose=0):
     """Tagger for fabric8-analytics."""
     # hack based on num values of logging.DEBUG, logging.INFO, ...
@@ -117,7 +118,8 @@ def cli_collect(**kwargs):
 @click.option('--no-synonyms',
               help='Do not compute synonyms.')
 @click.option('--occurrence-count-filter', type=int,
-              help="Filter out synonyms with low occurrence count (default: %d)." % defaults.OCCURRENCE_COUNT_FILTER)
+              help="Filter out synonyms with low occurrence count (default: %d)." %
+              defaults.OCCURRENCE_COUNT_FILTER)
 def cli_aggregate(**kwargs):
     """Aggregate keywords to a single file."""
     output_keywords_file = kwargs.pop('output_keywords_file')
