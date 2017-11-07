@@ -1,4 +1,6 @@
 directories="f8a_tagger"
+separate_files="f8a_tagger_cli.py setup.py"
+
 fail=0
 
 function prepare_venv() {
@@ -36,6 +38,27 @@ do
             let "fail++"
         fi
     done
+done
+
+
+echo
+echo "----------------------------------------------------"
+echo "Running Python linter against selected files:"
+echo $separate_files
+echo "----------------------------------------------------"
+
+# check for individual files
+for source in $separate_files
+do
+    echo $source
+    pycodestyle $source
+    if [ $? -eq 0 ]
+    then
+        echo "    Pass"
+    else
+        echo "    Fail"
+        let "fail++"
+    fi
 done
 
 
