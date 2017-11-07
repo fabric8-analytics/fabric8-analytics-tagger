@@ -1,4 +1,5 @@
 directories="f8a_tagger"
+separate_files="f8a_tagger_cli.py setup.py"
 pass=0
 fail=0
 
@@ -43,6 +44,32 @@ do
             let "fail++"
         fi
     done
+done
+
+
+echo
+echo "----------------------------------------------------"
+echo "Checking documentation strings in the following files"
+echo $separate_files
+echo "----------------------------------------------------"
+
+# check for individual files
+for source in $separate_files
+do
+    echo $source
+    pydocstyle --count $source
+    if [ $? -eq 0 ]
+    then
+        echo "    Pass"
+        let "pass++"
+    elif [ $? -eq 2 ]
+    then
+        echo "    Illegal usage (should not happen)"
+        exit 2
+    else
+        echo "    Fail"
+        let "fail++"
+    fi
 done
 
 
