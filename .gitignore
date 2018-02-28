@@ -7,3 +7,14 @@ venv-coala/
 build/
 f8a_tagger.egg-info/
 dist/
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
