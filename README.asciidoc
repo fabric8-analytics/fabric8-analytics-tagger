@@ -262,3 +262,16 @@ You can see implementation of parsers in the `f8a_tagger/parsers` directory.
 There is also present a set of collectors that collect keywords/topics/tags from various external resources such as PyPI, Maven central and such. These collectors produce a list of keywords with they occurrence count that can be later on used for keywords extraction.
 
 All collectors are present under `f8a_tagger/collectors` package.
+
+== Coding standards
+
+You can use scripts to check if the code follows PEP8 coding standards. How to use these script:
+
+----
+./run-linter.sh
+./check-docstyle.sh
+----
+
+The first script checks the indentation, line lengths, variable names, whitespace around operators etc. The second
+script checks all documentation strings - its presense and format. Please fix any warnings and errors reported by these
+scripts.
