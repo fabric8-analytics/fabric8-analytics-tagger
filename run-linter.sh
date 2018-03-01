@@ -1,4 +1,4 @@
-directories="f8a_tagger"
+directories="f8a_tagger tests"
 separate_files="f8a_tagger_cli.py setup.py"
 
 pass=0
