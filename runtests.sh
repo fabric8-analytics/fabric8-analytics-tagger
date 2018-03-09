@@ -2,6 +2,7 @@
 
 export PYTHONPATH=`pwd`/f8a_tagger/
 
+echo "Create Virtualenv for Python deps ..."
 function prepare_venv() {
     VIRTUALENV=`which virtualenv`
     if [ $? -eq 1 ]; then
