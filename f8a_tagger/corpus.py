@@ -66,7 +66,7 @@ class Corpus(object):
         :param path: path to file to which dump should be dump
         """
         _logger.debug("JSONifying corpus to '%s'", path)
-        with open(path, 'wb') as f:
+        with open(path, 'w') as f:
             json.dump({'entries': self._entries, 'names': self._names}, f,
                       sort_keys=True, separators=(',', ': '), indent=2)
         _logger.debug("Corpus written to '%s'", path)
