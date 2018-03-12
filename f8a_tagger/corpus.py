@@ -95,7 +95,7 @@ class Corpus(object):
         :param path: path to file from which corpus should be loaded
         """
         _logger.debug("Loading JSON corpus from '%s'", path)
-        with open(path, 'rb') as f:
+        with open(path, 'r') as f:
             content = json.load(f)
 
         instance = cls()
