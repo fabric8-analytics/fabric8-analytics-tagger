@@ -204,6 +204,7 @@ class KeywordsChief(object):
 
         # Remove any unwanted trailing/starting characters
         change = True
+        # FIX: TODO: this is endless loop actually
         while change:
             while keyword.startswith('.'):
                 keyword = keyword[1:]
@@ -231,6 +232,9 @@ class KeywordsChief(object):
         :return: a list of synonyms
         """
         synonyms = set()
+
+        # TODO: trim the keyword at the beginning?
+        # TODO: check for None?
 
         for delim in defaults.MULTIWORD_DELIMITERS:
             words = str(keyword).split(delim)
