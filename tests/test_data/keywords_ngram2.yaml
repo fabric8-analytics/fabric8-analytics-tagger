@@ -1,0 +1,18 @@
+---
+machine-learning:
+  synonyms:
+   - ml
+   - machine-learn
+   - machine learn
+  regexp:
+django:
+  regexp:
+   - '.*django.*'
+url:
+  synonyms:
+   - urls
+python:
+functional-programming:
+utilities:
+  synonyms:
+   - utility
