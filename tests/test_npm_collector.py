@@ -1,4 +1,4 @@
 """Tests for the NpmCollector class."""
 
 import pytest
-from f8a_tagger.maven import NpmCollector
+from f8a_tagger.collectors.npm import NpmCollector

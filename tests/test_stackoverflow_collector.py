@@ -1,4 +1,4 @@
 """Tests for the StackOverflowCollector class."""
 
 import pytest
-from f8a_tagger.pypi import StackOverflowCollector
+from f8a_tagger.collectors.stackoverflow import StackOverflowCollector
