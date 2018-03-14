@@ -57,6 +57,26 @@ def test_keyword_loading_from_bytestream():
         assert keywordsChief._keywords is not None
 
 
+class CustomLemmatizer(object):
+    """Custom lemmatizer to be used by following test."""
+
+    def __init__(self):
+        """Initialize this dummy class."""
+        pass
+
+    def lemmatize(self, x):
+        """Lemmatize one word."""
+        return x
+
+
+def test_custom_lemmatizer():
+    """Test words loading using custom lemmatizer."""
+    custom_lemmatizer = CustomLemmatizer()
+    keywordsChief = KeywordsChief("test_data/keywords.yaml", lemmatizer=custom_lemmatizer)
+    assert keywordsChief._keywords is not None
+    assert len(keywordsChief._keywords) == 6
+
+
 def test_keywords_property():
     """Check the 'keywords' property."""
     keywordsChief = KeywordsChief("test_data/keywords.yaml")
@@ -241,3 +261,4 @@ if __name__ == '__main__':
     test_is_keyword_negative()
     test_matches_keyword_pattern_positive()
     test_matches_keyword_pattern_negative()
+    test_custom_lemmatizer()
