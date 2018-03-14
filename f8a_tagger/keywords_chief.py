@@ -204,8 +204,8 @@ class KeywordsChief(object):
 
         # Remove any unwanted trailing/starting characters
         change = True
-        # FIX: TODO: this is endless loop actually
         while change:
+            change = False
             while keyword.startswith('.'):
                 keyword = keyword[1:]
                 change = True
