@@ -1,6 +1,7 @@
 """Tests for the KeywordsChief class."""
 
 import pytest
+import io
 from f8a_tagger.keywords_chief import KeywordsChief
 import f8a_tagger.defaults as defaults
 import f8a_tagger.errors
@@ -43,6 +44,17 @@ def test_keyword_file_check():
     for keyword_file in inputs:
         with pytest.raises(f8a_tagger.errors.InvalidInputError) as e:
             keywordsChief3 = KeywordsChief(keyword_file)
+
+
+def test_keyword_loading_from_bytestream():
+    """Test the checks performed over keyword file."""
+    # bytestream needs to be supported as well
+    with open("test_data/keywords.yaml", "r") as fin:
+        content = fin.read()
+        bytestream = io.BytesIO(content.encode())
+        fin = io.TextIOWrapper(bytestream)
+        keywordsChief = KeywordsChief("")
+        assert keywordsChief._keywords is not None
 
 
 def test_keywords_property():
@@ -215,6 +227,7 @@ if __name__ == '__main__':
     test_custom_keyword_file_loading()
     test_non_existing_keyword_file_loading()
     test_keyword_file_check()
+    test_keyword_loading_from_bytestream()
     test_keywords_property()
     test_get_keywords_count_method()
     test_get_average_occurence_count_method()
