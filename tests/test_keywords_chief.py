@@ -53,7 +53,7 @@ def test_keyword_loading_from_bytestream():
         content = fin.read()
         bytestream = io.BytesIO(content.encode())
         fin = io.TextIOWrapper(bytestream)
-        keywordsChief = KeywordsChief("")
+        keywordsChief = KeywordsChief(fin)
         assert keywordsChief._keywords is not None
 
 
