@@ -77,6 +77,46 @@ def test_custom_lemmatizer():
     assert len(keywordsChief._keywords) == 6
 
 
+class CustomStemmer(object):
+    """Custom stemmer to be used by following test."""
+
+    def __init__(self):
+        """Initialize this dummy class."""
+        pass
+
+    def stem(self, x):
+        """Steme one word."""
+        return x
+
+
+def test_custom_stemmer():
+    """Test words loading using custom stemmer."""
+    custom_stemmer = CustomStemmer()
+    keywordsChief = KeywordsChief("test_data/keywords.yaml", stemmer=custom_stemmer)
+    assert keywordsChief._keywords is not None
+    assert len(keywordsChief._keywords) == 6
+
+
+class UpdatedCustomStemmer(object):
+    """Custom stemmer to be used by following test."""
+
+    def __init__(self):
+        """Initialize this dummy class."""
+        pass
+
+    def stem(self, x):
+        """Steme one word."""
+        return "42"
+
+
+def test_synonyms_detection():
+    """Test detection of synonyms."""
+    custom_stemmer = UpdatedCustomStemmer()
+    keywordsChief = KeywordsChief("test_data/keywords.yaml", stemmer=custom_stemmer)
+    assert keywordsChief._keywords is not None
+    assert len(keywordsChief._keywords) == 6
+
+
 def test_keywords_property():
     """Check the 'keywords' property."""
     keywordsChief = KeywordsChief("test_data/keywords.yaml")
@@ -281,3 +321,5 @@ if __name__ == '__main__':
     test_matches_keyword_pattern_positive()
     test_matches_keyword_pattern_negative()
     test_custom_lemmatizer()
+    test_custom_stemmer()
+    test_synonyms_detection()
