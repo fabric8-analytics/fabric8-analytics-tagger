@@ -142,6 +142,23 @@ def test_compute_ngram_size_method():
     assert keywordsChief3.compute_ngram_size() == 3
 
 
+def test_get_synonyms_method_positive():
+    """Check the get_synonyms() method."""
+    keywordsChief = KeywordsChief("test_data/keywords.yaml")
+    assert "python" in keywordsChief.get_synonyms("python")
+    assert "machine-learning" in keywordsChief.get_synonyms("machine-learning")
+    assert "machine-learn" in keywordsChief.get_synonyms("machine-learning")
+    assert "ml" in keywordsChief.get_synonyms("machine-learning")
+
+
+def test_get_synonyms_method_negative():
+    """Check the get_synonyms() method."""
+    keywordsChief = KeywordsChief("test_data/keywords.yaml")
+    assert "XXX" not in keywordsChief.get_synonyms("python")
+    assert not keywordsChief.get_synonyms("unknown")
+    assert not keywordsChief.get_synonyms("")
+
+
 def test_get_keyword_method_positive():
     """Check the get_keyword() method."""
     keywordsChief = KeywordsChief("test_data/keywords.yaml")
@@ -252,6 +269,8 @@ if __name__ == '__main__':
     test_get_keywords_count_method()
     test_get_average_occurence_count_method()
     test_compute_ngram_size_method()
+    test_get_synonyms_method_positive()
+    test_get_synonyms_method_negative()
     test_get_keyword_method_positive()
     test_get_keyword_method_negative()
     test_extract_keywords()
