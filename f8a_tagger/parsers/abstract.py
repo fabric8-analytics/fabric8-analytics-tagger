@@ -16,4 +16,3 @@ class AbstractParser(metaclass=abc.ABCMeta):  # pylint: disable=too-few-public-m
         :return: raw/plain content representation
         :rtype: str
         """
-        pass
