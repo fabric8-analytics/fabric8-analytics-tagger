@@ -1,4 +1,4 @@
-"""Tests for the CoreParser class."""
+"""Tests for the all parser classes."""
 
 import pytest
 from f8a_tagger.parsers.parsers import *
