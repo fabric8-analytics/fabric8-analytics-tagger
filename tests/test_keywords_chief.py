@@ -227,6 +227,15 @@ def test_get_keyword_method_negative():
     assert keywordsChief.get_keyword("something_else") is None
 
 
+def test_get_keyword_special_cases():
+    """Check the get_keyword() method."""
+    keywordsChief = KeywordsChief("test_data/keywords.yaml")
+    # this is kinda hack as it possibly can't happens on the production
+    keywordsChief._keywords["XXX"] = None
+
+    assert keywordsChief.get_keyword("something_else") is None
+
+
 def test_extract_keywords():
     """Test the method extract_keywords()."""
     keywordsChief = KeywordsChief("test_data/keywords.yaml")
@@ -242,9 +251,14 @@ def test_extract_keywords():
 
 def test_filter_keywords():
     """Test the static method filter_keyword()."""
-    pass
-    # TODO: this method seems to be broken
-    # print(KeywordsChief.filter_keyword("python"))
+    assert KeywordsChief.filter_keyword("python") == ("python", [], [])
+    assert KeywordsChief.filter_keyword(".python") == ("python", [], [])
+    assert KeywordsChief.filter_keyword("python.") == ("python", [], [])
+    assert KeywordsChief.filter_keyword(".python.") == ("python", [], [])
+    assert KeywordsChief.filter_keyword("_python") == ("python", [], [])
+    assert KeywordsChief.filter_keyword("python_") == ("python", [], [])
+    assert KeywordsChief.filter_keyword("_python_") == ("python", [], [])
+    assert KeywordsChief.filter_keyword("___python___") == ("python", [], [])
 
 
 def test_compute_synonyms():
@@ -313,6 +327,7 @@ if __name__ == '__main__':
     test_get_synonyms_method_negative()
     test_get_keyword_method_positive()
     test_get_keyword_method_negative()
+    test_get_keyword_special_cases()
     test_extract_keywords()
     test_filter_keywords()
     test_compute_synonyms()
