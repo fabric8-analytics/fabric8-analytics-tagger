@@ -77,6 +77,46 @@ def test_custom_lemmatizer():
     assert len(keywordsChief._keywords) == 6
 
 
+class CustomStemmer(object):
+    """Custom stemmer to be used by following test."""
+
+    def __init__(self):
+        """Initialize this dummy class."""
+        pass
+
+    def stem(self, x):
+        """Steme one word."""
+        return x
+
+
+def test_custom_stemmer():
+    """Test words loading using custom stemmer."""
+    custom_stemmer = CustomStemmer()
+    keywordsChief = KeywordsChief("test_data/keywords.yaml", stemmer=custom_stemmer)
+    assert keywordsChief._keywords is not None
+    assert len(keywordsChief._keywords) == 6
+
+
+class UpdatedCustomStemmer(object):
+    """Custom stemmer to be used by following test."""
+
+    def __init__(self):
+        """Initialize this dummy class."""
+        pass
+
+    def stem(self, x):
+        """Steme one word."""
+        return "42"
+
+
+def test_synonyms_detection():
+    """Test detection of synonyms."""
+    custom_stemmer = UpdatedCustomStemmer()
+    keywordsChief = KeywordsChief("test_data/keywords.yaml", stemmer=custom_stemmer)
+    assert keywordsChief._keywords is not None
+    assert len(keywordsChief._keywords) == 6
+
+
 def test_keywords_property():
     """Check the 'keywords' property."""
     keywordsChief = KeywordsChief("test_data/keywords.yaml")
@@ -142,6 +182,23 @@ def test_compute_ngram_size_method():
     assert keywordsChief3.compute_ngram_size() == 3
 
 
+def test_get_synonyms_method_positive():
+    """Check the get_synonyms() method."""
+    keywordsChief = KeywordsChief("test_data/keywords.yaml")
+    assert "python" in keywordsChief.get_synonyms("python")
+    assert "machine-learning" in keywordsChief.get_synonyms("machine-learning")
+    assert "machine-learn" in keywordsChief.get_synonyms("machine-learning")
+    assert "ml" in keywordsChief.get_synonyms("machine-learning")
+
+
+def test_get_synonyms_method_negative():
+    """Check the get_synonyms() method."""
+    keywordsChief = KeywordsChief("test_data/keywords.yaml")
+    assert "XXX" not in keywordsChief.get_synonyms("python")
+    assert not keywordsChief.get_synonyms("unknown")
+    assert not keywordsChief.get_synonyms("")
+
+
 def test_get_keyword_method_positive():
     """Check the get_keyword() method."""
     keywordsChief = KeywordsChief("test_data/keywords.yaml")
@@ -170,6 +227,15 @@ def test_get_keyword_method_negative():
     assert keywordsChief.get_keyword("something_else") is None
 
 
+def test_get_keyword_special_cases():
+    """Check the get_keyword() method."""
+    keywordsChief = KeywordsChief("test_data/keywords.yaml")
+    # this is kinda hack as it possibly can't happens on the production
+    keywordsChief._keywords["XXX"] = None
+
+    assert keywordsChief.get_keyword("something_else") is None
+
+
 def test_extract_keywords():
     """Test the method extract_keywords()."""
     keywordsChief = KeywordsChief("test_data/keywords.yaml")
@@ -185,9 +251,14 @@ def test_extract_keywords():
 
 def test_filter_keywords():
     """Test the static method filter_keyword()."""
-    pass
-    # TODO: this method seems to be broken
-    # print(KeywordsChief.filter_keyword("python"))
+    assert KeywordsChief.filter_keyword("python") == ("python", [], [])
+    assert KeywordsChief.filter_keyword(".python") == ("python", [], [])
+    assert KeywordsChief.filter_keyword("python.") == ("python", [], [])
+    assert KeywordsChief.filter_keyword(".python.") == ("python", [], [])
+    assert KeywordsChief.filter_keyword("_python") == ("python", [], [])
+    assert KeywordsChief.filter_keyword("python_") == ("python", [], [])
+    assert KeywordsChief.filter_keyword("_python_") == ("python", [], [])
+    assert KeywordsChief.filter_keyword("___python___") == ("python", [], [])
 
 
 def test_compute_synonyms():
@@ -252,8 +323,11 @@ if __name__ == '__main__':
     test_get_keywords_count_method()
     test_get_average_occurence_count_method()
     test_compute_ngram_size_method()
+    test_get_synonyms_method_positive()
+    test_get_synonyms_method_negative()
     test_get_keyword_method_positive()
     test_get_keyword_method_negative()
+    test_get_keyword_special_cases()
     test_extract_keywords()
     test_filter_keywords()
     test_compute_synonyms()
@@ -262,3 +336,5 @@ if __name__ == '__main__':
     test_matches_keyword_pattern_positive()
     test_matches_keyword_pattern_negative()
     test_custom_lemmatizer()
+    test_custom_stemmer()
+    test_synonyms_detection()
