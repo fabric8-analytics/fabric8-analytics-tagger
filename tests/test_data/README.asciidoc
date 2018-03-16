@@ -1,0 +1,277 @@
+fabric8-analytics-tagger
+========================
+
+Keyword extractor and tagger for fabric8-analytics.
+
+== Usage
+
+For getting all available commands issue:
+
+```
+$ f8a_tagger_cli.py --help
+Usage: f8a_tagger_cli.py [OPTIONS] COMMAND [ARGS]...
+
+  Tagger for fabric8-analytics.
+
+Options:
+  -v, --verbose  Level of verbosity, can be applied multiple times.
+  --help         Show this message and exit.
+
+Commands:
+  aggregate  Aggregate keywords to a single file.
+  collect    Collect keywords from external resources.
+  diff       Compute diff on keyword files.
+  lookup     Perform keywords lookup.
+  reckon     Compute keywords and stopwords based on stemmer and lemmatizer configuration.
+```
+
+To run a command in verbose mode (adds additional messages), run:
+
+```sh
+$ f8a_tagger_cli.py -vvvv lookup /path/to/tree/or/file
+```
+
+Verbose output will give you additional insides on steps that are performed during execution (debug mode).
+
+== Installation using pip
+
+```sh
+$ git clone https://github.com/fabric8-analytics/fabric8-analytics-tagger && cd fabric8-analytics-tagger
+$ python3 setup.py install  # or make install
+```
+
+== Tagging workflow
+
+=== Collecting keywords - `collect`
+
+The prerequisite for tagging is to collect keywords that are used out there by developers. This also means that tagger uses keywords that are considered as interesting ones by developers.
+
+The collection is done by collectors (available in `f8a_tagger/collectors`). These collectors gather keywords and also count number of occurrences for gathered keywords. Collectors do not perform any additional post-processing, but rather gather raw keywords that are after that post-processed by the `aggregate` command (see bellow).
+
+An example of raw keywords can be link:https://github.com/fabric8-analytics/fabric8-analytics-tags/blob/master/raw/pypi_tags.yaml[the following YAML] file that keeps keywords gathered in PyPI ecosystem.
+
+=== Aggregating keywords - `aggregate`
+
+If you take a look at raw keywords that are gathered by the `collect` command explained above, you can easily spot a lot of keywords that are written in a wrong way (they have broken encoding, multi-line keywords, numerical values, one letter keywords, ...). These keywords should be removed and other keywords that are present should be normalized and, if possible, there can be computed some obvious synonyms that can be present during keywords lookup phase.
+
+The `aggregate` command handles:
+
+* keywords filtering - suspicious and obviously useless keywords can be directly thrown away (e.g. bogus keywords, one letter keywords, ...)
+* keywords normalization - all keywords are normalized to lowercase form, having only ASCII characters, multi-word keywords are separated with dashes rather than spaces
+* synonyms computation - some synonyms can be directly computed - e.g. some people use `machine-learning`, some use `machine learning`
+* aggregating multiple `keywords.yaml` files - the `aggregate` command can aggregate multiple `keywords.yaml` files into one, this is especially useful if there are more than one keywords sources available for collecting keywords
+
+The output of `aggregate` command is a single configuration file (could be JSON or YAML), that keeps the following (aggregated) entries:
+
+* keywords themselves
+* synonyms
+* regular expressions that match the given keyword
+* occurrence count of the given keyword in keyword sources (used later for keywords scoring, see bellow)
+
+An example of a keyword entries produced by the `aggregate` command could be:
+
+```yaml
+machine-learning:
+   synonyms:
+    - machine learning
+    - machinelearning
+    - machine-learning
+    - machine_learning
+  - occurrence_count: 56
+django:
+   occurrence_count: 2654
+   regexp:
+    - '.*django.*'
+```
+
+The `keywords.yaml` file can be, of course, additionally manually changed as desired.
+
+An example of automatically aggregated `keywords.yaml` can be found in link:https://github.com/fabric8-analytics/fabric8-analytics-tags/blob/master/pypi_tags.yaml[fabric8-analytics-tags] repository. This `keywords.yaml` file was computed based on link:https://github.com/fabric8-analytics/fabric8-analytics-tags/blob/master/raw/pypi_tags.yaml[collected raw keywords from PyPI] stated above.
+
+=== Keywords lookup - `lookup`
+
+The overall outcome of steps above is a single `keywords.yaml` file. This file, with `stopwords.txt` file keeping stopwords, is the input for the `lookup` command.
+
+The `lookup` command does the whole heavy computation needed for keywords extraction. It utilizes link:http://www.nltk.org/[NLTK] for utilizing many natural language processing tasks.
+
+The overall high-level overview of the `lookup` command can be described in the following steps:
+
+1. The first step is to do pre-processing of input files. Input files can be written in different formats. Except plaintext, there can be also used text files using different markup formats (such as Markdown, ASCIIdoc, and such).
+
+2. After input pre-processing there is available plaintext without any markup formatting parts. This text is after that split into sentences. The actual split is done in a smart way (so "This Mr. Baron e.g. Mr. Foo." will be one sentence - not just split on dots).
+
+3. Sentences are tokenized into words. This tokenization is done, again, in a smart way ("e.g. isn't" is split into three tokens - "e.g", "is" and "n't".
+
+4. link:https://en.wikipedia.org/wiki/Lemmatisation[Lemmatization] - all words (tokens) are replaced with their representative as words appear in several inflected forms. Lemmatization uses NLTK's WordNet corpus (large lexical database of English words).
+
+5. After lemmatization there is performed link:https://en.wikipedia.org/wiki/Stemming[stemming]. Stemming ensures that different words are mapped to their word stem (e.g. "licencing", "license" is same). There are available different stemmers, check `lookup --help` for listing of all available ones. Check out link:https://nlp.stanford.edu/IR-book/html/htmledition/stemming-and-lemmatization-1.html[Standford's NLP] for more insights on lemmatization and stemming.
+
+6. Unwanted tokens are removed - tokens are checked against stopwords file and if there is a match, unwanted tokens are removed. This step ensures that the lookup will perform faster and we also remove obviously wrong words that shouldn't be marked as keywords (words with high entropy).
+
+7. There are calculated ngrams for multi-word keywords by systematically concatenating tokens (e.g. tokens `["this", "is", "machine", "learning"]` with ngram size equal to 2 create the following tokens: `["this", "is", "machine", "learning", "this is", "is machine", "machine learning"]`. This step ensures that there can be performed lookup of multi-word keywords (such as "machine learning"). The actual ngrams size (bigrams, trigrams) is determined by `keywords.yaml` configuration file (based on synonyms), but can be explicitly stated using `--ngram-size` option.
+
+8. Actual lookup against `keywords.yaml` configuration file. Constructed array of tokens with ngrams is checked against `keywords.yaml` file. The output of this step is an array of found keywords during keywords mining.
+
+9. The last step performs scoring on found keywords based on their relevance in the system (based on occurrence count of the found keyword and occurrence count in the text).
+
+You can watch check output of all steps by running tagger in debug mode by supplying multiple `--verbose` command line options. In that case tagger will report what steps are performed, what is input and the outcome. This can also help you when debugging what is going on when using tagger.
+
+=== Working with keywords.yaml and stopwords
+
+There are prepared few commands that can make your life easier when working with keywords database.
+
+==== Using `reckon` command
+
+This command will apply lemmatization and stemming on your `keywords.yaml` and `stopwords.txt` files. The output is after that printed to you to check form of keywords and stopwords that will be used during lookup (in respect to lemmatization and stemming).
+
+Check `reckon --help` for more info on available options.
+
+==== Using `diff` command
+
+The `diff` command will give you an overview what has changed in keywords.yaml file. It simply prints added synonyms and regular expressions that differ in `keywords.yaml` files. Also there are reported missing/added keywords to help you see changes in your configuration files.
+
+== Configuration files
+
+=== keywords.yaml
+
+File `keywords.yaml` keeps all keywords that are in a form of:
+
+```yaml
+keyword:
+  occurrence_count: 42
+  synonyms:
+    - list
+    - of
+    - synonyms
+  regexp:
+    - 'list.*'
+    - 'o{1}f{1}'
+    - 'regular[ _-]expressions?'
+```
+
+A keyword is a key to dictionary containing additional fields:
+
+ * synonyms - for list of synonyms to the given keyword
+ * regexp - for list of regular expressions that match the given keyword
+ * occurrence_count - number of times the given keyword was found in the external source (helping with keywords scoring)
+
+For example, if you would like to define keyword `django` that matches all words that contain "`django`", just define:
+
+```yaml
+django:
+  occurrence_count: 1339
+  regexp:
+    - '.*django.*'
+```
+
+Another example demonstrates synonyms. To define synonyms IP, IPv4 and IPv6 as synonyms to networking, just define the following entry:
+
+```yaml
+networking:
+  synonyms:
+    - ip
+    - ipv4
+    - ipv6
+```
+
+Regular expressions conform to link:https://docs.python.org/3/library/re.html[Python regular expressions].
+
+=== stopwords.txt
+
+This file contains all stopwords (words that should be left out from text analysis) in raw/plaintext and regular expression format. All stopwords are listed one per line.
+
+An example of stopwords file keeping stopwords ("would", "should" and "are"):
+
+```
+would
+should
+are
+```
+
+There can be also specified regular expression that describe stopwords.
+
+An example of regular expression stopwords:
+
+```
+re: [0-9][0-9]*
+re: https?://[a-zA-Z0-9][a-zA-Z0-9.]*.[a-z]{2,3}
+```
+
+In the example above, there are listed two regular expressions to define stopwords. The first one defines stopwords that consist purely of integer numbers (any integer number will be dropped from textual analysis). The latter example filters out any URL (the regexp is simplified).
+
+Regular expressions conforms to link:https://docs.python.org/3/library/re.html[Python regular expressions].
+
+== Development environment
+
+If you would like to set up a virtualenv for your environment, just issue prepared `make venv` Make target:
+```sh
+$ make venv
+```
+
+After this command, there should be available virtual environment that can be accessed using:
+
+```sh
+$ source venv/bin/activate
+```
+
+And exited using:
+
+```sh
+$ deactivate
+```
+
+To run checks, issue `make check` command:
+
+```sh
+$ make check
+```
+
+The check Make target runs a set of linters provided by link:https://coala.io/[Coala]; there is also run `pylint`, `pydocstyle`. To execute only desired linter, run appropriate Make target:
+
+```sh
+$ make coala
+$ make pylint
+$ make pydocstyle
+```
+
+== Evaluating accuracy
+
+Tagger does not use any machine learning technique to gather keywords. All steps correspond to data mining techniques so there is no "accuracy" that could be evaluated. Tagger simply checks for important, key words that are relevant (low entropy). The overall quality of keywords found is equal to quality of `keywords.yaml` file.
+
+== Practices
+
+* all collectors should receive a set of keywords that are all lowercase
+* the only delimiter that is allowed for multi word keywords is a dash (`-`), all spaces should be replaced with dash
+* synonyms for multi word keywords are automatically created in aggregate command, if requested
+
+== README.json
+
+README.json is a format introduced by one task (`GitReadmeCollectorTask`) present in fabric8-analytics-worker. The structure of document is described by one JSON file containing two keys:
+
+ * `content` - raw content of README file
+ * `type` - content type that can be markdown, ReStructuredText, ... (see `f8a_tagger.parsers.abstract` for more info)
+
+== Parsers
+
+Parsers are used to transform README.json files to plaintext files. Their main goal is to remove any markup specific annotations and provide just plaintext that can be directly used for additional text processing.
+
+You can see implementation of parsers in the `f8a_tagger/parsers` directory.
+
+== Collectors
+
+There is also present a set of collectors that collect keywords/topics/tags from various external resources such as PyPI, Maven central and such. These collectors produce a list of keywords with they occurrence count that can be later on used for keywords extraction.
+
+All collectors are present under `f8a_tagger/collectors` package.
+
+== Coding standards
+
+You can use scripts to check if the code follows PEP8 coding standards. How to use these script:
+
+----
+./run-linter.sh
+./check-docstyle.sh
+----
+
+The first script checks the indentation, line lengths, variable names, whitespace around operators etc. The second
+script checks all documentation strings - its presense and format. Please fix any warnings and errors reported by these
+scripts.

@@ -13,6 +13,7 @@ def test_initial_state():
     assert keywordsChief._stemmer == defaults.DEFAULT_STEMMER
     assert keywordsChief._lemmatizer == defaults.DEFAULT_LEMMATIZER
     assert keywordsChief._keywords is not None
+    assert len(keywordsChief._keywords) >= 0
     assert keywordsChief._keywords_prop is None
 
 
@@ -20,6 +21,7 @@ def test_custom_keyword_file_loading():
     """Test if the custom keyword file could be loaded."""
     keywordsChief = KeywordsChief("test_data/keywords.yaml")
     assert keywordsChief._keywords is not None
+    # now we know exactly, how many keywords are in
     assert len(keywordsChief._keywords) == 6
 
 
@@ -34,10 +36,12 @@ def test_keyword_file_check():
     # None is accepted
     keywordsChief1 = KeywordsChief(None)
     assert keywordsChief1._keywords is not None
+    assert len(keywordsChief1._keywords) >= 0
 
     # Empty string is accepted as well
     keywordsChief2 = KeywordsChief("")
     assert keywordsChief2._keywords is not None
+    assert len(keywordsChief2._keywords) >= 0
 
     # most other types are not accepted
     inputs = [True, False, 42, 1.5, [], {}]
@@ -55,6 +59,7 @@ def test_keyword_loading_from_bytestream():
         fin = io.TextIOWrapper(bytestream)
         keywordsChief = KeywordsChief(fin)
         assert keywordsChief._keywords is not None
+        assert len(keywordsChief._keywords) >= 0
 
 
 class CustomLemmatizer(object):
@@ -65,7 +70,7 @@ class CustomLemmatizer(object):
         pass
 
     def lemmatize(self, x):
-        """Lemmatize one word."""
+        """Lemmatize one word by simply returning it."""
         return x
 
 
@@ -74,6 +79,7 @@ def test_custom_lemmatizer():
     custom_lemmatizer = CustomLemmatizer()
     keywordsChief = KeywordsChief("test_data/keywords.yaml", lemmatizer=custom_lemmatizer)
     assert keywordsChief._keywords is not None
+    # now we know exactly, how many keywords are in
     assert len(keywordsChief._keywords) == 6
 
 
@@ -85,7 +91,7 @@ class CustomStemmer(object):
         pass
 
     def stem(self, x):
-        """Steme one word."""
+        """Steme one word by simply returning it."""
         return x
 
 
@@ -94,6 +100,7 @@ def test_custom_stemmer():
     custom_stemmer = CustomStemmer()
     keywordsChief = KeywordsChief("test_data/keywords.yaml", stemmer=custom_stemmer)
     assert keywordsChief._keywords is not None
+    # now we know exactly, how many keywords are in
     assert len(keywordsChief._keywords) == 6
 
 
@@ -105,7 +112,7 @@ class UpdatedCustomStemmer(object):
         pass
 
     def stem(self, x):
-        """Steme one word."""
+        """Steme one word, returns the same value regardless of input."""
         return "42"
 
 
@@ -114,6 +121,7 @@ def test_synonyms_detection():
     custom_stemmer = UpdatedCustomStemmer()
     keywordsChief = KeywordsChief("test_data/keywords.yaml", stemmer=custom_stemmer)
     assert keywordsChief._keywords is not None
+    # now we know exactly, how many keywords are in
     assert len(keywordsChief._keywords) == 6
 
 
@@ -170,7 +178,7 @@ def test_get_average_occurence_count_method():
 def test_compute_ngram_size_method():
     """Check the compute_ngram_size() method."""
     keywordsChief1 = KeywordsChief("test_data/keywords.yaml")
-    # we expect 1
+    # we expect 1 here
     assert keywordsChief1.compute_ngram_size() == 1
 
     keywordsChief2 = KeywordsChief("test_data/keywords_ngram2.yaml")
@@ -214,6 +222,7 @@ def test_get_keyword_method_positive():
         "XXdjangoYY": "django"
     }
 
+    # check the presence of all expected keywords
     for token, expected_keyword in expected_keywords.items():
         assert keywordsChief.get_keyword(token) == expected_keyword
 
@@ -243,6 +252,8 @@ def test_extract_keywords():
     assert keywordsChief.extract_keywords([""]) == {}
     assert keywordsChief.extract_keywords(["unknown"]) == {}
     assert keywordsChief.extract_keywords(["python"]) == {"python": 1}
+    assert keywordsChief.extract_keywords(["ml"]) == {"machine-learning": 1}
+    assert keywordsChief.extract_keywords(["machine-learning"]) == {"machine-learning": 1}
     assert keywordsChief.extract_keywords(["python", "functional-programming", "unknown"]) == \
         {'python': 1, 'functional-programming': 1}
     assert keywordsChief.extract_keywords(["python", "functional-programming", "ml"]) == \
@@ -251,6 +262,8 @@ def test_extract_keywords():
 
 def test_filter_keywords():
     """Test the static method filter_keyword()."""
+    assert KeywordsChief.filter_keyword("") == ("", [], [])
+    # check how the special chars are filtered/ignored by the filter_keywords() method
     assert KeywordsChief.filter_keyword("python") == ("python", [], [])
     assert KeywordsChief.filter_keyword(".python") == ("python", [], [])
     assert KeywordsChief.filter_keyword("python.") == ("python", [], [])
@@ -259,6 +272,7 @@ def test_filter_keywords():
     assert KeywordsChief.filter_keyword("python_") == ("python", [], [])
     assert KeywordsChief.filter_keyword("_python_") == ("python", [], [])
     assert KeywordsChief.filter_keyword("___python___") == ("python", [], [])
+    assert KeywordsChief.filter_keyword("_._python_._") == ("python", [], [])
 
 
 def test_compute_synonyms():
@@ -309,6 +323,9 @@ def test_matches_keyword_pattern_negative():
     assert not KeywordsChief.matches_keyword_pattern(" ")
     assert not KeywordsChief.matches_keyword_pattern("???")
     assert not KeywordsChief.matches_keyword_pattern("a^b^c")
+    assert not KeywordsChief.matches_keyword_pattern(" functional programming")
+    assert not KeywordsChief.matches_keyword_pattern(" functional_programming")
+    assert not KeywordsChief.matches_keyword_pattern(" functional programming ")
     assert not KeywordsChief.matches_keyword_pattern("functional programming")
     assert not KeywordsChief.matches_keyword_pattern("functional&programming")
 

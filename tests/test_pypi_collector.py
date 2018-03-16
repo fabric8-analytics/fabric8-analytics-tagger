@@ -1,4 +1,50 @@
 """Tests for the PypiCollector class."""
 
 import pytest
-from f8a_tagger.collectors.pypi import PypiCollector
+from unittest.mock import *
+import requests
+
+from f8a_tagger.collectors.pypi import *
+
+
+def test_initial_state():
+    """Check the initial state of the class."""
+    c = PypiCollector()
+    assert c is not None
+
+
+class _response:
+
+    def __init__(self, status_code, text):
+        self.status_code = status_code
+        self.text = text
+
+
+original_requests_get = requests.get
+
+
+def mocked_requests_get(url):
+    """Implement mocked function requests.get()."""
+    if url == PypiCollector._PYPI_SIMPLE_URL:
+        return _response(200, """
+            <html>
+            <head><title>Simple Index</title><meta name="api-version" value="2" /></head><body>
+            <a href='mock'>mock</a><br/>
+            <a href='clojure-py'>clojure_py</a><br/>
+            <a href='behave'>behave</a><br/>
+            </body></html>""")
+    else:
+        return original_requests_get(url)
+
+
+@patch("f8a_tagger.collectors.pypi.requests.get", side_effect=mocked_requests_get)
+def test_execute_method(mocked_requests_get_obj):
+    """Test the execute() method."""
+    c = PypiCollector()
+
+    keywords = c.execute()
+
+
+if __name__ == '__main__':
+    test_initial_state()
+    test_execute_method()
