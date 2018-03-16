@@ -10,7 +10,7 @@ def test_get_registered_stemmers():
     """Test for the function get_registered_stemmers()."""
     stemmers = f8a_tagger.recipes.get_registered_stemmers()
     assert stemmers
-    assert len(stemmers) == 3
+    assert len(stemmers) >= 3
 
 
 def test_get_registered_scorers():
@@ -18,7 +18,7 @@ def test_get_registered_scorers():
     scorers = f8a_tagger.recipes.get_registered_scorers()
     assert scorers
     # ['Count', 'RelativeUsage', 'TfIdf']
-    assert len(scorers) == 3
+    assert len(scorers) >= 3
 
 
 def test_get_registered_collectors():
@@ -26,7 +26,7 @@ def test_get_registered_collectors():
     collectors = f8a_tagger.recipes.get_registered_collectors()
     assert collectors
     # ['Maven', 'NPM', 'PyPI', 'StackOverflow']
-    assert len(collectors) == 4
+    assert len(collectors) >= 4
 
 
 def test_reckon():
@@ -42,6 +42,10 @@ def test_lookup_text(mocked_function):
     score = f8a_tagger.recipes.lookup_text("Hello world")
     assert not score
 
+    # test the check in the function
+    with pytest.raises(InvalidInputError) as e:
+        f8a_tagger.recipes.lookup_text(None)
+
 
 @patch('f8a_tagger.tokenizer.Tokenizer.tokenize', return_value=["token1", "token2", "token3"])
 def test_lookup_file(mocked_function):
@@ -55,9 +59,12 @@ def test_lookup_file(mocked_function):
     # check the logging error part
     result = f8a_tagger.recipes.lookup_file("test_data/", ignore_errors=True)
 
+    # check the logging error part
+    result = f8a_tagger.recipes.lookup_file("http://google.com", ignore_errors=True)
+
 
 @patch('f8a_tagger.tokenizer.Tokenizer.tokenize', return_value=["token1", "token2", "token3"])
-def test_lookup_readme_wrong_input():
+def test_lookup_readme_proper_input(mocked_function):
     """Test for the function lookup_readme()."""
     payload = {
         "type": "reStructuredText",
@@ -116,6 +123,40 @@ def test_perform_lookup(mocked_function):
     assert not score
 
 
+def test_aggregate():
+    """Test for the function aggregate()."""
+    with pytest.raises(ValueError):
+        f8a_tagger.recipes.aggregate(None)
+
+    keywords = f8a_tagger.recipes.aggregate(["test_data/keywords.yaml"])
+    assert "python" in keywords
+    assert "machine-learning" in keywords
+
+    keywords = f8a_tagger.recipes.aggregate(["test_data/keywords.yaml"],
+                                            occurrence_count_filter=1)
+    assert "python" in keywords
+    assert "machine-learning" in keywords
+
+    keywords = f8a_tagger.recipes.aggregate(["test_data/keywords.yaml"],
+                                            occurrence_count_filter=2)
+    assert keywords == {}
+
+    keywords = f8a_tagger.recipes.aggregate(["test_data/keywords.yaml", "test_data/keywords.yaml"],
+                                            occurrence_count_filter=1)
+    assert "python" in keywords
+    assert "machine-learning" in keywords
+
+    # special file with keyword that does not matches
+    keywords = f8a_tagger.recipes.aggregate(["test_data/keywords_does_not_match.yaml"])
+    assert keywords == {}
+
+
+def test_collect():
+    """Test for the function collect()."""
+    with pytest.raises(Exception) as e:
+        f8a_tagger.recipes.collect()
+
+
 if __name__ == '__main__':
     test_get_registered_stemmers()
     test_get_registered_scorers()
@@ -123,7 +164,9 @@ if __name__ == '__main__':
     test_reckon()
     test_lookup_text()
     test_lookup_file()
-    test_lookup_readme()
+    test_lookup_readme_proper_input()
     test_lookup_readme_wrong_input()
     test_prepare_lookup()
     test_perform_lookup()
+    test_aggregate()
+    test_collect()
