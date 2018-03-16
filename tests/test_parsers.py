@@ -1,4 +1,4 @@
-"""Tests for the all parser classes."""
+"""Tests for all currently supported parser classes."""
 
 import pytest
 from f8a_tagger.parsers.parsers import *
@@ -45,6 +45,7 @@ def test_text_parser():
     p = TextParser()
 
     parsed = p.parse("plain text content")
+    assert parsed == "plain text content"
 
 
 def test_markdown_parser():
@@ -52,6 +53,7 @@ def test_markdown_parser():
     p = MarkdownParser()
 
     parsed = p.parse("markdown content")
+    assert parsed.strip() == "markdown content"
 
 
 def test_html_parser():
@@ -59,6 +61,10 @@ def test_html_parser():
     p = HtmlParser()
 
     parsed = p.parse("<html><body>HTML content</body></html>")
+    assert parsed == "HTML content"
+
+    parsed = p.parse("<div>two</div> <div>divs</div>")
+    assert parsed == "two divs"
 
 
 def test_restructuredtext_parser():
@@ -66,12 +72,14 @@ def test_restructuredtext_parser():
     p = ReStructuredTextParser()
 
     parsed = p.parse("content")
+    assert parsed.strip() == "content"
 
 
 def test_asciidoc_parser():
     """Test the AsciidocParser parser."""
     p = AsciidocParser()
 
+    # this parser is not fully implemented yet
     with pytest.raises(NotImplementedError) as e:
         p.parse("content")
 
@@ -80,6 +88,7 @@ def test_textile_parser():
     """Test the TextileParser parser."""
     p = TextileParser()
 
+    # this parser is not fully implemented yet
     with pytest.raises(NotImplementedError) as e:
         p.parse("content")
 
@@ -88,6 +97,7 @@ def test_rdoc_parser():
     """Test the RdocParser parser."""
     p = RdocParser()
 
+    # this parser is not fully implemented yet
     with pytest.raises(NotImplementedError) as e:
         p.parse("content")
 
@@ -96,6 +106,7 @@ def test_org_parser():
     """Test the OrgParser parser."""
     p = OrgParser()
 
+    # this parser is not fully implemented yet
     with pytest.raises(NotImplementedError) as e:
         p.parse("content")
 
@@ -104,6 +115,7 @@ def test_creole_parser():
     """Test the CreoleParser parser."""
     p = CreoleParser()
 
+    # this parser is not fully implemented yet
     with pytest.raises(NotImplementedError) as e:
         p.parse("content")
 
@@ -112,6 +124,7 @@ def test_mediawiki_parser():
     """Test the MediawikiParserparser."""
     p = MediawikiParser()
 
+    # this parser is not fully implemented yet
     with pytest.raises(NotImplementedError) as e:
         p.parse("content")
 
@@ -120,6 +133,7 @@ def test_pod_parser():
     """Test the PodParser parser."""
     p = PodParser()
 
+    # this parser is not fully implemented yet
     with pytest.raises(NotImplementedError) as e:
         p.parse("content")
 
