@@ -1,4 +1,4 @@
-"""Tests for the Stemmer class."""
+"""Tests for the Stemmer class and for all currently supported stemmers."""
 
 import pytest
 from f8a_tagger.stemmer import *
@@ -34,7 +34,8 @@ def test_get_registered_stemmers():
     """Test for the class method get_registered_stemmers()."""
     stemmers = Stemmer.get_registered_stemmers()
     assert stemmers
-    assert len(stemmers) == 3
+    # we expected at least three stemmers to be registered
+    assert len(stemmers) >= 3
 
 
 if __name__ == '__main__':
