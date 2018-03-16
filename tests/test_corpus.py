@@ -9,6 +9,7 @@ import os
 def test_initial_state():
     """Check the initial state of Corpus."""
     c = Corpus()
+    assert c
     assert c.get_size() == 0
     assert c.get_memory_usage() == 0
 
@@ -16,6 +17,7 @@ def test_initial_state():
 def test_add_method():
     """Check the method Corpus.add()."""
     c = Corpus()
+    assert c.get_size() == 0
     c.add("file1", ["token1", "token2", "token3"])
     assert c.get_size() == 1
     c.add("file2", ["token1", "token2", "token3"])
@@ -80,6 +82,9 @@ def test_load_json_method():
     assert "file2" in c2._names
     assert ["test"] in c2._entries
     assert ["foo", "bar"] in c2._entries
+
+    with pytest.raises(TypeError) as e:
+        Corpus.load_json(None)
 
 
 if __name__ == '__main__':
