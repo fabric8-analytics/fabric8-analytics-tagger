@@ -53,7 +53,6 @@ class Scoring(metaclass=abc.ABCMeta):
         :param keywords: keywords computed on lookup
         :return: keywords with computed score
         """
-        raise NotImplementedError("Implement scorer")
 
 
 class CountScoring(Scoring):
