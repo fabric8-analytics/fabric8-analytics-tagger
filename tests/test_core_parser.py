@@ -15,9 +15,11 @@ def test_parse_method():
     parsed = c.parse("hello world", "txt")
     assert parsed == "hello world"
 
-    c = CoreParser()
     parsed = c.parse("<html><body>hello world</body></html>", "html")
     assert parsed == "hello world"
+
+    parsed = c.parse("<div>two</div> <div>divs</div>", "html")
+    assert parsed == "two divs"
 
     # wrong content-type checking
     with pytest.raises(ValueError) as e:
@@ -43,6 +45,7 @@ def test_parse_file_method_negative():
     """Check the method parse_file()."""
     c = CoreParser()
 
+    # Asciidoc parser is not implemented yet
     with pytest.raises(NotImplementedError) as e:
         parsed = c.parse_file("test_data/README.asciidoc")
 
@@ -73,8 +76,11 @@ def test_parse_readme_json_method_positive():
 
 
 def test_parse_readme_json_method_negative():
-    """Check the method parse_readme_json()."""
+    """Check the method parse_readme_json() for wrong input."""
     c = CoreParser()
+
+    with pytest.raises(TypeError) as e:
+        parsed = c.parse_readme_json(None)
 
     with pytest.raises(ValueError) as e:
         parsed = c.parse_readme_json("test_data/README_empty.json")
