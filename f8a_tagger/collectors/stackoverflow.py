@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""PyPI keywords collector."""
+"""StackOverflow keywords collector."""
 
 import requests
 
