@@ -127,13 +127,16 @@ class Tokenizer(object):
                 _logger.debug("Dropping raw stopword '%s'", token)
                 continue
 
+            skip_token = False
             for regexp in self._regexp_stopwords:
                 if re.fullmatch(regexp, token):
                     _logger.debug("Dropping stopword '%s' based on regexp '%s'", token,
                                   regexp.pattern)
-                    continue
+                    skip_token = True
+                    break
 
-            ret.append(token)
+            if not skip_token:
+                ret.append(token)
 
         return ret
 
