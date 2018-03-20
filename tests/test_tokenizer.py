@@ -32,6 +32,54 @@ def test_stopwords_reading():
         tokenizer = Tokenizer({}, None)
 
 
+def test_raw_stopwords_property():
+    """Check the raw_stopwords property."""
+    tokenizer = Tokenizer("test_data/stopwords.txt", None)
+    stopwords = tokenizer.raw_stopwords
+    assert stopwords
+    expected = {"i", "me", "our", "he", "she"}
+    # subset operation
+    assert expected <= set(stopwords)
+
+
+def test_regexp_stopwords_property():
+    """Check the regexp_stopwords property."""
+    tokenizer = Tokenizer("test_data/stopwords.txt", None)
+    stopwords = tokenizer.regexp_stopwords
+    assert stopwords
+    assert "re: [0-9.]+" in stopwords
+
+
+def test_remove_stopwords_method():
+    """Check the remove_stopwords method."""
+    tokenizer = Tokenizer("test_data/stopwords.txt", None)
+
+    stopwords = tokenizer.raw_stopwords
+    assert stopwords
+    expected = {"i", "me", "our", "he", "she"}
+    assert expected <= set(stopwords)
+
+    # remove some stopwords and check again
+    stopwords = tokenizer.remove_stopwords(["foo", "something", "me", "our", "bar"])
+    expected = {"foo", "bar"}
+    assert expected == set(stopwords)
+
+    # remove some stopwords and check again
+    stopwords = tokenizer.remove_stopwords(["foo", "0", "123", "6502", "bar"])
+    print(stopwords)
+    expected = {"foo", "bar"}
+    assert expected == set(stopwords)
+
+    # remove some stopwords and check again
+    stopwords = tokenizer.remove_stopwords(["foo", "-0", "-123", "-6502", "bar"])
+    print(stopwords)
+    expected = {"foo", "bar", "-0", "-123", "-6502"}
+    assert expected == set(stopwords)
+
+
 if __name__ == '__main__':
     test_initial_state()
     test_stopwords_reading()
+    test_raw_stopwords_property()
+    test_regexp_stopwords_property()
+    test_remove_stopwords_method()
