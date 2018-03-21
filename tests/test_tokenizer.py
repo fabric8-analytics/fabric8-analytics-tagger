@@ -140,6 +140,70 @@ def test_lemmatize_method():
     tokens = ["foo", "bar", "me", "your", "6502"]
     tokenizer._lemmatize(tokens)
     assert tokens == ["***", "***", "***", "***", "***"]
+
+
+class CustomStemmer(object):
+    """Custom stemmer to be used by following test."""
+
+    def __init__(self):
+        """Initialize this dummy class."""
+        pass
+
+    def stem(self, x):
+        """Stem one word by simply returning it."""
+        return x
+
+
+class CustomStemmer2(object):
+    """Custom stemmer to be used by following test."""
+
+    def __init__(self):
+        """Initialize this dummy class."""
+        pass
+
+    def stem(self, x):
+        """Stem one word by altering it."""
+        return "*" + x
+
+
+class CustomStemmer3(object):
+    """Custom stemmer to be used by following test."""
+
+    def __init__(self):
+        """Initialize this dummy class."""
+        pass
+
+    def stem(self, x):
+        """Stem one word by returning constant."""
+        return "***"
+
+
+def test_stem_method():
+    """Check the _stem method."""
+    tokenizer = Tokenizer("test_data/stopwords.txt", None)
+
+    # test with no stemmer
+    tokens = ["foo", "bar", "me", "your", "6502"]
+    tokenizer._stem(tokens)
+    assert tokens == ["foo", "bar", "me", "your", "6502"]
+
+    # test with custom stemmer
+    tokenizer = Tokenizer("test_data/stopwords.txt", stemmer=CustomStemmer())
+    tokens = ["foo", "bar", "me", "your", "6502"]
+    tokenizer._stem(tokens)
+    assert tokens == ["foo", "bar", "me", "your", "6502"]
+
+    # test with custom stemmer
+    tokenizer = Tokenizer("test_data/stopwords.txt", stemmer=CustomStemmer2())
+    tokens = ["foo", "bar", "me", "your", "6502"]
+    tokenizer._stem(tokens)
+    assert tokens == ["*foo", "*bar", "*me", "*your", "*6502"]
+
+    # test with custom stemmer
+    tokenizer = Tokenizer("test_data/stopwords.txt", stemmer=CustomStemmer3())
+    tokens = ["foo", "bar", "me", "your", "6502"]
+    tokenizer._stem(tokens)
+    assert tokens == ["***", "***", "***", "***", "***"]
 if __name__ == '__main__':
     test_initial_state()
     test_stopwords_reading()
