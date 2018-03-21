@@ -204,9 +204,53 @@ def test_stem_method():
     tokens = ["foo", "bar", "me", "your", "6502"]
     tokenizer._stem(tokens)
     assert tokens == ["***", "***", "***", "***", "***"]
+
+
+def sent_tokenize_mock(content):
+    """Mock the function nlth.sent_tokenize."""
+    return content.split(".")
+
+
+def word_tokenize_mock(sentence):
+    """Mock the function nlth.word_tokenize."""
+    return sentence.split(" ")
+
+
+@patch('nltk.sent_tokenize', side_effect=sent_tokenize_mock)
+@patch('nltk.word_tokenize', side_effect=word_tokenize_mock)
+def test_tokenize(mock1, mock2):
+    """Check the tokenize method."""
+    tokenizer = Tokenizer("test_data/stopwords.txt", 2)
+    content = "The prerequisite for tagging is to collect keywords that are used " + \
+              "out there by developers.This also means that tagger uses keywords " + \
+              "that are considered as interesting ones by developers."
+    results = tokenizer.tokenize(content)
+    assert results
+
+
+def sent_tokenize_mock_2(content):
+    """Mock the function nlth.sent_tokenize."""
+    raise LookupError("foo bar")
+
+
+@patch('nltk.sent_tokenize', side_effect=sent_tokenize_mock_2)
+def test_tokenize_error_handling(mock):
+    """Check the tokenize method."""
+    tokenizer = Tokenizer("test_data/stopwords.txt", 2)
+    content = "The prerequisite for tagging is to collect keywords that are used " + \
+              "out there by developers.This also means that tagger uses keywords " + \
+              "that are considered as interesting ones by developers."
+    with pytest.raises(InstallPrepareError) as e:
+        tokenizer.tokenize(content)
+
+
 if __name__ == '__main__':
     test_initial_state()
     test_stopwords_reading()
     test_raw_stopwords_property()
     test_regexp_stopwords_property()
     test_remove_stopwords_method()
+    test_lemmatize_method()
+    test_stem_method()
+    test_tokenize()
+    test_tokenize_error_handling()
