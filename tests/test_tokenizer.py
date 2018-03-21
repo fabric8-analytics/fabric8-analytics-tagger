@@ -1,8 +1,11 @@
 """Tests for the Tokenizer class."""
 
 import pytest
+from unittest.mock import *
+
 import io
 from f8a_tagger.tokenizer import Tokenizer
+from f8a_tagger.errors import InstallPrepareError
 from f8a_tagger.errors import InvalidInputError
 
 
@@ -66,17 +69,77 @@ def test_remove_stopwords_method():
 
     # remove some stopwords and check again
     stopwords = tokenizer.remove_stopwords(["foo", "0", "123", "6502", "bar"])
-    print(stopwords)
     expected = {"foo", "bar"}
     assert expected == set(stopwords)
 
     # remove some stopwords and check again
     stopwords = tokenizer.remove_stopwords(["foo", "-0", "-123", "-6502", "bar"])
-    print(stopwords)
     expected = {"foo", "bar", "-0", "-123", "-6502"}
     assert expected == set(stopwords)
 
 
+class CustomLemmatizer(object):
+    """Custom lemmatizer to be used by following test."""
+
+    def __init__(self):
+        """Initialize this dummy class."""
+        pass
+
+    def lemmatize(self, x):
+        """Lemmatize one word by simply returning it."""
+        return x
+
+
+class CustomLemmatizer2(object):
+    """Custom lemmatizer to be used by following test."""
+
+    def __init__(self):
+        """Initialize this dummy class."""
+        pass
+
+    def lemmatize(self, x):
+        """Lemmatize one word by altering it."""
+        return "*" + x
+
+
+class CustomLemmatizer3(object):
+    """Custom lemmatizer to be used by following test."""
+
+    def __init__(self):
+        """Initialize this dummy class."""
+        pass
+
+    def lemmatize(self, x):
+        """Lemmatize one word by returning constant."""
+        return "***"
+
+
+def test_lemmatize_method():
+    """Check the _lemmatize method."""
+    tokenizer = Tokenizer("test_data/stopwords.txt", None)
+
+    # test with no lemmatizer
+    tokens = ["foo", "bar", "me", "your", "6502"]
+    tokenizer._lemmatize(tokens)
+    assert tokens == ["foo", "bar", "me", "your", "6502"]
+
+    # test with custom lemmatizer
+    tokenizer = Tokenizer("test_data/stopwords.txt", lemmatizer=CustomLemmatizer())
+    tokens = ["foo", "bar", "me", "your", "6502"]
+    tokenizer._lemmatize(tokens)
+    assert tokens == ["foo", "bar", "me", "your", "6502"]
+
+    # test with custom lemmatizer
+    tokenizer = Tokenizer("test_data/stopwords.txt", lemmatizer=CustomLemmatizer2())
+    tokens = ["foo", "bar", "me", "your", "6502"]
+    tokenizer._lemmatize(tokens)
+    assert tokens == ["*foo", "*bar", "*me", "*your", "*6502"]
+
+    # test with custom lemmatizer
+    tokenizer = Tokenizer("test_data/stopwords.txt", lemmatizer=CustomLemmatizer3())
+    tokens = ["foo", "bar", "me", "your", "6502"]
+    tokenizer._lemmatize(tokens)
+    assert tokens == ["***", "***", "***", "***", "***"]
 if __name__ == '__main__':
     test_initial_state()
     test_stopwords_reading()
