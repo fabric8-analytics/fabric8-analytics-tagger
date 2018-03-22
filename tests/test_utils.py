@@ -35,3 +35,33 @@ def test_iter_files_negative():
     with pytest.raises(RuntimeError) as e:
         x = list(iter_files("http://google.com/X", ignore_errors=False))
         assert len(x) > 0
+
+
+def test_json_dumps():
+    """Test the function json_dumps()."""
+    payload = {
+        "foo": "bar",
+        "X": "Y"
+    }
+    str = json_dumps(payload)
+    assert str
+
+
+def path_home_mock():
+    """Mock the static method Path.home."""
+    raise AttributeError()
+
+
+def test_get_files_dir():
+    """Test the function get_files_dir()."""
+    dir = get_files_dir()
+    assert dir
+    assert dir.endswith(".fabric8-analytics-tagger")
+
+
+@patch('f8a_tagger.utils.Path.home', side_effect=path_home_mock)
+def test_get_files_dir_older_python(mocked_method):
+    """Test the function get_files_dir()."""
+    dir = get_files_dir()
+    assert dir
+    assert dir.endswith(".fabric8-analytics-tagger")
