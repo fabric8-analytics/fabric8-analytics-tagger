@@ -65,3 +65,30 @@ def test_get_files_dir_older_python(mocked_method):
     dir = get_files_dir()
     assert dir
     assert dir.endswith(".fabric8-analytics-tagger")
+
+
+def test_cwd():
+    """Test the generator cwd."""
+    with cwd(".") as dir:
+        # nothing is yielded
+        assert dir is None
+
+
+def test_progressbarsize():
+    """Test the progressbarize function."""
+    x = range(10)
+    y = progressbarize(x)
+    assert x == y
+
+    z = progressbarize(x, progress=True)
+    assert z
+
+
+if __name__ == '__main__':
+    test_iter_files()
+    test_iter_files_negative()
+    test_json_dumps()
+    test_get_files_dir()
+    test_get_files_dir_older_python()
+    test_cwd()
+    test_progressbarsize()
