@@ -21,3 +21,4 @@ def test_execute_method():
 
 if __name__ == '__main__':
     test_initial_state()
+    test_execute_method()
