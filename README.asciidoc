@@ -265,7 +265,7 @@ All collectors are present under `f8a_tagger/collectors` package.
 
 == Coding standards
 
-You can use scripts to check if the code follows PEP8 coding standards. How to use these script:
+You can use scripts to check if the code follows PEP 8 and PEP 257 coding standards. How to use these script:
 
 ----
 ./run-linter.sh
