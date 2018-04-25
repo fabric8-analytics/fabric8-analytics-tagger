@@ -15,5 +15,18 @@ function prepare_venv() {
 
 [ "$NOVENV" == "1" ] || prepare_venv || exit 1
 
+echo "*****************************************"
+echo "*** Cyclomatic complexity measurement ***"
+echo "*****************************************"
+radon cc -s -a -i venv .
+
+echo "*****************************************"
+echo "*** Maintainability Index measurement ***"
+echo "*****************************************"
+radon mi -s -i venv .
+
+echo "*****************************************"
+echo "*** Unit tests ***"
+echo "*****************************************"
 cd tests
 PYTHONDONTWRITEBYTECODE=1 python3 `which pytest` --cov=../f8a_tagger/ --cov-report term-missing -vv .
