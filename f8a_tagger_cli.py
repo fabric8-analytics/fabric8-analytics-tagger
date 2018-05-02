@@ -143,6 +143,7 @@ def cli_diff(keywords1_file_path, keywords2_file_path, synonyms_only=False, keyw
              regexp_only=False):
     """Compute diff on keyword files."""
     # pylint: disable=too-many-locals
+    # TODO: reduce cyclomatic complexity
     if synonyms_only and keywords_only:
         raise ValueError('Cannot use --synonyms-only and --keywords-only at the same time')
 

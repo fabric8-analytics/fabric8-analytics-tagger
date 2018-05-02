@@ -210,6 +210,7 @@ def collect(collector=None, ignore_errors=False, use_progressbar=False):
 def aggregate(input_keywords_file, no_synonyms=None, use_progressbar=False,
               occurrence_count_filter=None):
     # pylint: disable=too-many-branches
+    # TODO: reduce cyclomatic complexity
     """Aggregate available topics.
 
     :param input_keywords_file: a list/tuple of input keywords files to process
