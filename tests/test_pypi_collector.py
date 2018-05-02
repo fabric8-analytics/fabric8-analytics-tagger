@@ -33,6 +33,7 @@ def mocked_requests_get(url):
             <a href='clojure-py'>clojure_py</a><br/>
             <a href='behave'>behave</a><br/>
             <a href='0.0.1'>0.0.1</a><br/>
+            <a href='selinon'>selinon</a><br/>
             </body></html>""")
     else:
         return original_requests_get(url)

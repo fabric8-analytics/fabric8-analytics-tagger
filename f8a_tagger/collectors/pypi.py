@@ -4,6 +4,8 @@
 import requests
 
 from bs4 import BeautifulSoup
+from urllib.parse import urljoin
+
 import daiquiri
 from f8a_tagger.keywords_set import KeywordsSet
 from f8a_tagger.utils import progressbarize
@@ -17,7 +19,7 @@ class PypiCollector(CollectorBase):
     """PyPI keywords collector."""
 
     _PYPI_SIMPLE_URL = 'https://pypi.python.org/simple/'
-    _PACKAGE_BASE_URL = 'https://pypi.python.org/pypi/'
+    _PACKAGE_BASE_URL = 'https://pypi.python.org/pypi/project'
 
     def execute(self, ignore_errors=True, use_progressbar=False):
         """Collect PyPI keywords."""
@@ -32,7 +34,8 @@ class PypiCollector(CollectorBase):
         soup = BeautifulSoup(response.text, 'lxml')
         for link in progressbarize(soup.find_all('a'), use_progressbar):
             package_name = link.text
-            response = requests.get("{}/{}".format(self._PACKAGE_BASE_URL, package_name))
+            url = urljoin(self._PACKAGE_BASE_URL, package_name)
+            response = requests.get(url)
             if response.status_code != 200:
                 error_msg = "Failed to retrieve package information for '{}', " \
                             "response status code: {}".\
@@ -43,7 +46,8 @@ class PypiCollector(CollectorBase):
                 raise RuntimeError(error_msg)
 
             package_soup = BeautifulSoup(response.text, 'lxml')
-            meta_keywords = package_soup.find_all('meta', attrs={'name': 'keywords'})
+            # meta_keywords = package_soup.find_all('meta', attrs={'name': 'keywords'})
+            meta_keywords = package_soup.find_all('p', attrs={'class': 'tags'})
             if len(meta_keywords) != 1:
                 warn_msg = "Failed to parse and find keywords for '%s'" % package_name
                 _logger.warning(warn_msg)
@@ -51,10 +55,14 @@ class PypiCollector(CollectorBase):
 
             # some packages have comma hardcoded in the keywords list, split keywords there as well
             found_keywords = []
-            for word in meta_keywords[0].get('content', '').split(' '):
-                found_keywords += [k.lower() for k in word.split(',')]
+            keywords_spans = meta_keywords[0].find_all('span', attrs={'class': 'package-keyword'})
+            for span in keywords_spans:
+                for word in span.contents:
+                    found_keywords += [k.strip().lower() for k in word.split(',')
+                                       if k.strip() != ""]
 
             _logger.debug("Found keywords %s in '%s'", found_keywords, package_name)
+
             for keyword in set(found_keywords):
                 keywords_set.add(keyword)
 
