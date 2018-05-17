@@ -216,7 +216,6 @@ def check_input_keywords_file(input_keywords_file):
 def aggregate(input_keywords_file, no_synonyms=None, use_progressbar=False,
               occurrence_count_filter=None):
     # pylint: disable=too-many-branches
-    # TODO: reduce cyclomatic complexity
     """Aggregate available topics.
 
     :param input_keywords_file: a list/tuple of input keywords files to process

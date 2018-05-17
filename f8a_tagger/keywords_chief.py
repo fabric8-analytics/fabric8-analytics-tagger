@@ -22,7 +22,6 @@ class KeywordsChief(object):
 
     def __init__(self, keyword_file=None, lemmatizer=False, stemmer=None):
         # pylint: disable=too-many-branches
-        # TODO: reduce cyclomatic complexity
         """Construct.
 
         :param keyword_file: a path to keyword file
