@@ -130,25 +130,9 @@ def cli_aggregate(**kwargs):
     _print_result(ret, output_keywords_file, output_format)
 
 
-@cli.command('diff')
-@click.argument('keywords1_file_path', type=click.Path(exists=True, file_okay=True, dir_okay=False))
-@click.argument('keywords2_file_path', type=click.Path(exists=True, file_okay=True, dir_okay=False))
-@click.option('-s', '--synonyms-only', default=False, is_flag=True,
-              help='Print only changes in synonyms.')
-@click.option('-k', '--keywords-only', default=False, is_flag=True,
-              help='Print only changes in keywords.')
-@click.option('-r', '--regexp-only', default=False, is_flag=True,
-              help='Print only changes in regular expressions.')
-def cli_diff(keywords1_file_path, keywords2_file_path, synonyms_only=False, keywords_only=False,
-             regexp_only=False):
+def find_diffs(keywords1, keywords2, keywords1_file_path, keywords2_file_path,
+               synonyms_only, keywords_only, regexp_only):
     """Compute diff on keyword files."""
-    # pylint: disable=too-many-locals
-    # TODO: reduce cyclomatic complexity
-    if synonyms_only and keywords_only:
-        raise ValueError('Cannot use --synonyms-only and --keywords-only at the same time')
-
-    keywords1 = anymarkup.parse_file(keywords1_file_path)
-    keywords2 = anymarkup.parse_file(keywords2_file_path)
     differ = False
 
     for action, keywords_a, keywords_b, file_path in (('Removed', keywords1, keywords2,
@@ -174,7 +158,30 @@ def cli_diff(keywords1_file_path, keywords2_file_path, synonyms_only=False, keyw
                         print("%s regexp '%s' for keyword '%s' in file '%s'" %
                               (action, regexp, keyword, file_path))
                         differ = True
+    return differ
 
+
+@cli.command('diff')
+@click.argument('keywords1_file_path', type=click.Path(exists=True, file_okay=True, dir_okay=False))
+@click.argument('keywords2_file_path', type=click.Path(exists=True, file_okay=True, dir_okay=False))
+@click.option('-s', '--synonyms-only', default=False, is_flag=True,
+              help='Print only changes in synonyms.')
+@click.option('-k', '--keywords-only', default=False, is_flag=True,
+              help='Print only changes in keywords.')
+@click.option('-r', '--regexp-only', default=False, is_flag=True,
+              help='Print only changes in regular expressions.')
+def cli_diff(keywords1_file_path, keywords2_file_path, synonyms_only=False, keywords_only=False,
+             regexp_only=False):
+    """Retrieve diff on keyword files."""
+    # pylint: disable=too-many-locals
+    if synonyms_only and keywords_only:
+        raise ValueError('Cannot use --synonyms-only and --keywords-only at the same time')
+
+    keywords1 = anymarkup.parse_file(keywords1_file_path)
+    keywords2 = anymarkup.parse_file(keywords2_file_path)
+
+    differ = find_diffs(keywords1, keywords2, keywords1_file_path, keywords2_file_path,
+                        synonyms_only, keywords_only, regexp_only)
     if not differ:
         print("Files '%s' and '%s' do not differ" % (keywords1_file_path, keywords2_file_path))
 

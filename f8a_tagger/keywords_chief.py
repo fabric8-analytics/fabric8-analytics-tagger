@@ -22,7 +22,6 @@ class KeywordsChief(object):
 
     def __init__(self, keyword_file=None, lemmatizer=False, stemmer=None):
         # pylint: disable=too-many-branches
-        # TODO: reduce cyclomatic complexity
         """Construct.
 
         :param keyword_file: a path to keyword file
@@ -32,13 +31,7 @@ class KeywordsChief(object):
         self._stemmer = stemmer or defaults.DEFAULT_STEMMER
         self._lemmatizer = lemmatizer or defaults.DEFAULT_LEMMATIZER
 
-        if isinstance(keyword_file, str) or keyword_file is None:
-            with open(keyword_file or self._DEFAULT_KEYWORD_FILE_PATH, 'r') as f:
-                content = f.read()
-        elif isinstance(keyword_file, io.TextIOBase):
-            content = keyword_file.read()
-        else:
-            raise InvalidInputError("Unknown keyword file provided - %s" % (type(keyword_file)))
+        content = self.read_keyword_file(keyword_file)
 
         self._keywords = anymarkup.parse(content)
         self._keywords_prop = None
@@ -85,6 +78,16 @@ class KeywordsChief(object):
                                       "for keyword '%s'",
                                       synonym, new_synonym, keyword)
                         entry['synonyms'][idx] = new_synonym
+
+    def read_keyword_file(self, keyword_file):
+        """Read keyword file."""
+        if isinstance(keyword_file, str) or keyword_file is None:
+            with open(keyword_file or self._DEFAULT_KEYWORD_FILE_PATH, 'r') as f:
+                return f.read()
+        elif isinstance(keyword_file, io.TextIOBase):
+            return keyword_file.read()
+        else:
+            raise InvalidInputError("Unknown keyword file provided - %s" % (type(keyword_file)))
 
     @property
     def keywords(self):
