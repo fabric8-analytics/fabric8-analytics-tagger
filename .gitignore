@@ -7,6 +7,7 @@ venv-coala/
 build/
 f8a_tagger.egg-info/
 dist/
+.pytest_cache
 
 # Unit test / coverage reports
 htmlcov/
