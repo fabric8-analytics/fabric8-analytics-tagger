@@ -48,7 +48,7 @@ class PypiCollector(CollectorBase):
             package_soup = BeautifulSoup(response.text, 'lxml')
             # meta_keywords = package_soup.find_all('meta', attrs={'name': 'keywords'})
             meta_keywords = package_soup.find_all('p', attrs={'class': 'tags'})
-            if len(meta_keywords) != 1:
+            if len(meta_keywords) < 1:
                 warn_msg = "Failed to parse and find keywords for '%s'" % package_name
                 _logger.warning(warn_msg)
                 continue
