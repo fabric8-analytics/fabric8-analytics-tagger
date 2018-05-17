@@ -207,6 +207,12 @@ def collect(collector=None, ignore_errors=False, use_progressbar=False):
     return keywords_set.keywords
 
 
+def check_input_keywords_file(input_keywords_file):
+    """Check the existence of input_keywords_file."""
+    if not input_keywords_file:
+        raise ValueError('No input keywords files provided')
+
+
 def aggregate(input_keywords_file, no_synonyms=None, use_progressbar=False,
               occurrence_count_filter=None):
     # pylint: disable=too-many-branches
@@ -219,8 +225,7 @@ def aggregate(input_keywords_file, no_synonyms=None, use_progressbar=False,
     :param occurrence_count_filter: filter out keywords with low occurrence count
     :return:
     """
-    if not input_keywords_file:
-        raise ValueError('No input keywords files provided')
+    check_input_keywords_file(input_keywords_file)
 
     occurrence_count_filter = occurrence_count_filter or 0
 
