@@ -1,6 +1,8 @@
 fabric8-analytics-tagger
 ========================
 
+image:https://ci.centos.org/view/Devtools/job/devtools-fabric8-analytics-tagger-fabric8-analytics/badge/icon[Build status, link:https://ci.centos.org/view/Devtools/job/devtools-fabric8-analytics-tagger-fabric8-analytics/]
+
 Keyword extractor and tagger for fabric8-analytics.
 
 == Usage
