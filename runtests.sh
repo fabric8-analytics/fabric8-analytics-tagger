@@ -1,5 +1,7 @@
 #! /bin/bash
 
+COVERAGE_THRESHOLD=90
+
 export PYTHONPATH=`pwd`/f8a_tagger/
 
 echo "Create Virtualenv for Python deps ..."
@@ -29,4 +31,4 @@ echo "*****************************************"
 echo "*** Unit tests ***"
 echo "*****************************************"
 cd tests
-PYTHONDONTWRITEBYTECODE=1 python3 `which pytest` --cov=../f8a_tagger/ --cov-report term-missing -vv .
+PYTHONDONTWRITEBYTECODE=1 python3 `which pytest` --cov=../f8a_tagger/ --cov-report term-missing --cov-fail-under=$COVERAGE_THRESHOLD -vv .
