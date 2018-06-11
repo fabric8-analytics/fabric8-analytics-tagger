@@ -3,6 +3,8 @@ fabric8-analytics-tagger
 
 image:https://ci.centos.org/view/Devtools/job/devtools-fabric8-analytics-tagger-fabric8-analytics/badge/icon[Build status, link:https://ci.centos.org/view/Devtools/job/devtools-fabric8-analytics-tagger-fabric8-analytics/]
 
+image:https://codecov.io/gh/fabric8-analytics/fabric8-analytics-tagger/branch/master/graph/badge.svg[Code coverage, link:https://codecov.io/gh/fabric8-analytics/fabric8-analytics-tagger]
+
 Keyword extractor and tagger for fabric8-analytics.
 
 == Usage
