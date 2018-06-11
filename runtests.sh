@@ -31,4 +31,4 @@ echo "*****************************************"
 echo "*** Unit tests ***"
 echo "*****************************************"
 cd tests
-PYTHONDONTWRITEBYTECODE=1 python3 `which pytest` --cov=../f8a_tagger/ --cov-report term-missing --cov-fail-under=$COVERAGE_THRESHOLD -vv .
+PYTHONDONTWRITEBYTECODE=1 python3 `which pytest` --cov=../f8a_tagger/ --cov-report term-missing --cov-report xml --cov-fail-under=$COVERAGE_THRESHOLD -vv .
