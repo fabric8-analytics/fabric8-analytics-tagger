@@ -177,7 +177,7 @@ BODY: JSON data
         "missing_packages": [],
         "outlier_package_list": [
             {
-                "outlier_prbability": 0.99789845842189628,
+                "outlier_probability": 0.99789845842189628,
                 "package_name": "io.vertx:vertx-core",
                 "topic_list": [
                     "http",
@@ -187,7 +187,7 @@ BODY: JSON data
                 ]
             },
             {
-                "outlier_prbability": 0.99585300969280544,
+                "outlier_probability": 0.99585300969280544,
                 "package_name": "io.vertx:vertx-web",
                 "topic_list": [
                     "vertx-web",
