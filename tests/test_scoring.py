@@ -2,7 +2,7 @@
 
 import pytest
 from f8a_tagger.keywords_chief import KeywordsChief
-from f8a_tagger.scoring import *
+from f8a_tagger.scoring import Scoring, RelativeUsageScoring
 
 
 def test_get_registered_scorers():

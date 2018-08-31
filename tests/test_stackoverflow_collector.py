@@ -1,7 +1,7 @@
 """Tests for the StackOverflowCollector class."""
 
 import pytest
-from unittest.mock import *
+from unittest.mock import patch
 from f8a_tagger.collectors.stackoverflow import StackOverflowCollector
 from f8a_tagger.keywords_set import KeywordsSet
 

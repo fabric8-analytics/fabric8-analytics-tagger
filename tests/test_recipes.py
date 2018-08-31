@@ -1,7 +1,7 @@
 """Tests for functions from recipes module."""
 
 import pytest
-from unittest.mock import *
+from unittest.mock import patch
 from f8a_tagger.errors import InvalidInputError
 import f8a_tagger.recipes
 

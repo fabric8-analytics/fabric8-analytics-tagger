@@ -1,7 +1,7 @@
 """Tests for the Tokenizer class."""
 
 import pytest
-from unittest.mock import *
+from unittest.mock import patch
 
 import io
 from f8a_tagger.tokenizer import Tokenizer

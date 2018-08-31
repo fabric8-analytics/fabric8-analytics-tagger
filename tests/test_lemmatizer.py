@@ -1,6 +1,6 @@
 """Tests for the Lemmatizer class."""
 
-from f8a_tagger.lemmatizer import *
+from f8a_tagger.lemmatizer import Lemmatizer
 
 from nltk.stem.wordnet import WordNetLemmatizer
 

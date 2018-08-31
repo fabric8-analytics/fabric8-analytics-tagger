@@ -1,7 +1,9 @@
 """Tests for all currently supported parser classes."""
 
 import pytest
-from f8a_tagger.parsers.parsers import *
+from f8a_tagger.parsers.parsers import TextParser, MarkdownParser, HtmlParser, AsciidocParser
+from f8a_tagger.parsers.parsers import ReStructuredTextParser, TextileParser, RdocParser
+from f8a_tagger.parsers.parsers import OrgParser, CreoleParser, MediawikiParser, PodParser
 
 
 def test_initial_states():

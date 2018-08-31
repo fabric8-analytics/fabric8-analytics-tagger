@@ -1,8 +1,8 @@
 """Tests for the __init__ script."""
 
 import pytest
-from unittest.mock import *
-from f8a_tagger import *
+from unittest.mock import patch
+from f8a_tagger import prepare
 from f8a_tagger.errors import RemoteDependencyMissingError
 
 

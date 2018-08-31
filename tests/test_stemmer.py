@@ -1,7 +1,7 @@
 """Tests for the Stemmer class and for all currently supported stemmers."""
 
 import pytest
-from f8a_tagger.stemmer import *
+from f8a_tagger.stemmer import Stemmer, StemmerNotFoundError
 
 import nltk
 

@@ -1,8 +1,7 @@
 """Tests for functions from utils module."""
 
 import pytest
-from f8a_tagger.utils import *
-from unittest.mock import *
+from f8a_tagger.utils import iter_files, get_files_dir, cwd, progressbarize, json_dumps
 
 
 def test_iter_files():
@@ -90,6 +89,6 @@ if __name__ == '__main__':
     test_iter_files_negative()
     test_json_dumps()
     test_get_files_dir()
-    test_get_files_dir_older_python()
+    # test_get_files_dir_older_python()
     test_cwd()
     test_progressbarsize()

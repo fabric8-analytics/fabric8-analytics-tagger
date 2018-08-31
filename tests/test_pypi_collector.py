@@ -1,10 +1,10 @@
 """Tests for the PypiCollector class."""
 
 import pytest
-from unittest.mock import *
+from unittest.mock import patch
 import requests
 
-from f8a_tagger.collectors.pypi import *
+from f8a_tagger.collectors.pypi import PypiCollector
 
 
 def test_initial_state():
