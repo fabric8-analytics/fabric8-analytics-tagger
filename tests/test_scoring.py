@@ -2,7 +2,6 @@
 
 import pytest
 from f8a_tagger.keywords_chief import KeywordsChief
-from f8a_tagger.keywords_set import KeywordsSet
 from f8a_tagger.scoring import *
 
 
