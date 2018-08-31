@@ -31,6 +31,7 @@ class _response:
 
 def mocked_requests_1(url):
     """Implement mocked function requests.get()."""
+    assert url
     return _response(200, False, """
         <html>
         <head><title>Simple Index</title><meta name="api-version" value="2" /></head><body>
@@ -41,7 +42,7 @@ def mocked_requests_1(url):
 
 
 @patch("f8a_tagger.collectors.stackoverflow.requests.get", side_effect=mocked_requests_1)
-def test_execute_method_negative1(mock):
+def test_execute_method_negative1(_mocked_get):
     """Test the execute() method."""
     c = StackOverflowCollector()
 
@@ -65,7 +66,7 @@ def mocked_add(self, x, y):
 
 
 @patch("f8a_tagger.keywords_set.KeywordsSet.add", side_effect=mocked_add, autospec=True)
-def test_execute_method_negative2(mock):
+def test_execute_method_negative2(_mocked_add):
     """Test the execute() method."""
     c = StackOverflowCollector()
 
@@ -90,7 +91,7 @@ def mocked_add_2(self, x, y):
 
 
 @patch("f8a_tagger.keywords_set.KeywordsSet.add", side_effect=mocked_add_2, autospec=True)
-def test_execute_method_negative3(mock):
+def test_execute_method_negative3(_mocked_add):
     """Test the execute() method."""
     c = StackOverflowCollector()
 

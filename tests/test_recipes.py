@@ -37,7 +37,7 @@ def test_reckon():
 
 
 @patch('f8a_tagger.tokenizer.Tokenizer.tokenize', return_value=["token1", "token2", "token3"])
-def test_lookup_text(mocked_function):
+def test_lookup_text(_mocked_function):
     """Test for the function lookup_text()."""
     score = f8a_tagger.recipes.lookup_text("Hello world")
     assert not score
@@ -48,7 +48,7 @@ def test_lookup_text(mocked_function):
 
 
 @patch('f8a_tagger.tokenizer.Tokenizer.tokenize', return_value=["token1", "token2", "token3"])
-def test_lookup_file(mocked_function):
+def test_lookup_file(_mocked_function):
     """Test for the function lookup_file()."""
     result = f8a_tagger.recipes.lookup_file("test_data/README_rst.json", ignore_errors=True)
     result = f8a_tagger.recipes.lookup_file("test_data/README_rst.json")
@@ -64,7 +64,7 @@ def test_lookup_file(mocked_function):
 
 
 @patch('f8a_tagger.tokenizer.Tokenizer.tokenize', return_value=["token1", "token2", "token3"])
-def test_lookup_readme_proper_input(mocked_function):
+def test_lookup_readme_proper_input(_mocked_function):
     """Test for the function lookup_readme()."""
     payload = {
         "type": "reStructuredText",
@@ -115,7 +115,7 @@ def test_prepare_lookup():
 
 
 @patch('f8a_tagger.tokenizer.Tokenizer.tokenize', return_value=["token1", "token2", "token3"])
-def test_perform_lookup(mocked_function):
+def test_perform_lookup(_mocked_function):
     """Test for the function _perform_lookup()."""
     ngram_size, tokenizer, chief, parser = f8a_tagger.recipes._prepare_lookup(
         keywords_file="test_data/keywords.yaml")

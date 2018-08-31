@@ -218,7 +218,7 @@ def word_tokenize_mock(sentence):
 
 @patch('nltk.sent_tokenize', side_effect=sent_tokenize_mock)
 @patch('nltk.word_tokenize', side_effect=word_tokenize_mock)
-def test_tokenize(mock1, mock2):
+def test_tokenize(_mock1, _mock2):
     """Check the tokenize method."""
     tokenizer = Tokenizer("test_data/stopwords.txt", 2)
     content = "The prerequisite for tagging is to collect keywords that are used " + \
@@ -234,7 +234,7 @@ def sent_tokenize_mock_2(content):
 
 
 @patch('nltk.sent_tokenize', side_effect=sent_tokenize_mock_2)
-def test_tokenize_error_handling(mock):
+def test_tokenize_error_handling(_mock):
     """Check the tokenize method."""
     tokenizer = Tokenizer("test_data/stopwords.txt", 2)
     content = "The prerequisite for tagging is to collect keywords that are used " + \

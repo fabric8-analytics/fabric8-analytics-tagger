@@ -21,11 +21,12 @@ class _response:
 
 def mocked_requests_get(url):
     """Implement mocked function requests.get()."""
+    assert url
     return _response(404, "Not Found", False)
 
 
 @patch("requests.get", side_effect=mocked_requests_get)
-def test_prepare_negative(mocked_requests_get_obj):
+def test_prepare_negative(_mocked_requests_get_obj):
     """Test the execute() method."""
     with pytest.raises(RemoteDependencyMissingError) as e:
         prepare()
