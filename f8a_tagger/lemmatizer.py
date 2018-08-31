@@ -10,4 +10,5 @@ class Lemmatizer(object):  # pylint: disable=too-few-public-methods
     @classmethod
     def get_lemmatizer(cls):
         """Get lemmatizer instance."""
+        assert cls is not None
         return WordNetLemmatizer()

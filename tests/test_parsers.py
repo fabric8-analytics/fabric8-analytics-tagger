@@ -1,7 +1,9 @@
 """Tests for all currently supported parser classes."""
 
 import pytest
-from f8a_tagger.parsers.parsers import *
+from f8a_tagger.parsers.parsers import TextParser, MarkdownParser, HtmlParser, AsciidocParser
+from f8a_tagger.parsers.parsers import ReStructuredTextParser, TextileParser, RdocParser
+from f8a_tagger.parsers.parsers import OrgParser, CreoleParser, MediawikiParser, PodParser
 
 
 def test_initial_states():
@@ -80,7 +82,7 @@ def test_asciidoc_parser():
     p = AsciidocParser()
 
     # this parser is not fully implemented yet
-    with pytest.raises(NotImplementedError) as e:
+    with pytest.raises(NotImplementedError):
         p.parse("content")
 
 
@@ -89,7 +91,7 @@ def test_textile_parser():
     p = TextileParser()
 
     # this parser is not fully implemented yet
-    with pytest.raises(NotImplementedError) as e:
+    with pytest.raises(NotImplementedError):
         p.parse("content")
 
 
@@ -98,7 +100,7 @@ def test_rdoc_parser():
     p = RdocParser()
 
     # this parser is not fully implemented yet
-    with pytest.raises(NotImplementedError) as e:
+    with pytest.raises(NotImplementedError):
         p.parse("content")
 
 
@@ -107,7 +109,7 @@ def test_org_parser():
     p = OrgParser()
 
     # this parser is not fully implemented yet
-    with pytest.raises(NotImplementedError) as e:
+    with pytest.raises(NotImplementedError):
         p.parse("content")
 
 
@@ -116,7 +118,7 @@ def test_creole_parser():
     p = CreoleParser()
 
     # this parser is not fully implemented yet
-    with pytest.raises(NotImplementedError) as e:
+    with pytest.raises(NotImplementedError):
         p.parse("content")
 
 
@@ -125,7 +127,7 @@ def test_mediawiki_parser():
     p = MediawikiParser()
 
     # this parser is not fully implemented yet
-    with pytest.raises(NotImplementedError) as e:
+    with pytest.raises(NotImplementedError):
         p.parse("content")
 
 
@@ -134,7 +136,7 @@ def test_pod_parser():
     p = PodParser()
 
     # this parser is not fully implemented yet
-    with pytest.raises(NotImplementedError) as e:
+    with pytest.raises(NotImplementedError):
         p.parse("content")
 
 

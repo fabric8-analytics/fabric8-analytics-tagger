@@ -1,7 +1,7 @@
 """Tests for the Tokenizer class."""
 
 import pytest
-from unittest.mock import *
+from unittest.mock import patch
 
 import io
 from f8a_tagger.tokenizer import Tokenizer
@@ -31,7 +31,7 @@ def test_stopwords_reading():
         tokenizer = Tokenizer(fin, None)
         assert tokenizer
 
-    with pytest.raises(InvalidInputError) as e:
+    with pytest.raises(InvalidInputError):
         tokenizer = Tokenizer({}, None)
 
 
@@ -218,7 +218,7 @@ def word_tokenize_mock(sentence):
 
 @patch('nltk.sent_tokenize', side_effect=sent_tokenize_mock)
 @patch('nltk.word_tokenize', side_effect=word_tokenize_mock)
-def test_tokenize(mock1, mock2):
+def test_tokenize(_mock1, _mock2):
     """Check the tokenize method."""
     tokenizer = Tokenizer("test_data/stopwords.txt", 2)
     content = "The prerequisite for tagging is to collect keywords that are used " + \
@@ -234,13 +234,13 @@ def sent_tokenize_mock_2(content):
 
 
 @patch('nltk.sent_tokenize', side_effect=sent_tokenize_mock_2)
-def test_tokenize_error_handling(mock):
+def test_tokenize_error_handling(_mock):
     """Check the tokenize method."""
     tokenizer = Tokenizer("test_data/stopwords.txt", 2)
     content = "The prerequisite for tagging is to collect keywords that are used " + \
               "out there by developers.This also means that tagger uses keywords " + \
               "that are considered as interesting ones by developers."
-    with pytest.raises(InstallPrepareError) as e:
+    with pytest.raises(InstallPrepareError):
         tokenizer.tokenize(content)
 
 

@@ -1,7 +1,7 @@
 """Tests for the Stemmer class and for all currently supported stemmers."""
 
 import pytest
-from f8a_tagger.stemmer import *
+from f8a_tagger.stemmer import Stemmer, StemmerNotFoundError
 
 import nltk
 
@@ -22,12 +22,15 @@ def test_get_stemmer_negative():
     """Test for the method get_stemmer()."""
     with pytest.raises(StemmerNotFoundError):
         stemmer = Stemmer.get_stemmer("unknown")
+        print(stemmer)
 
     with pytest.raises(StemmerNotFoundError):
         stemmer = Stemmer.get_stemmer("")
+        print(stemmer)
 
     with pytest.raises(StemmerNotFoundError):
         stemmer = Stemmer.get_stemmer(None)
+        print(stemmer)
 
 
 def test_get_registered_stemmers():

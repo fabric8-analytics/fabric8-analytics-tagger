@@ -2,8 +2,7 @@
 
 import pytest
 from f8a_tagger.keywords_chief import KeywordsChief
-from f8a_tagger.keywords_set import KeywordsSet
-from f8a_tagger.scoring import *
+from f8a_tagger.scoring import Scoring, RelativeUsageScoring
 
 
 def test_get_registered_scorers():
@@ -20,7 +19,7 @@ def test_get_scoring():
     s = Scoring.get_scoring('Count')
     assert s
 
-    with pytest.raises(Exception) as e:
+    with pytest.raises(Exception):
         Scoring.get_scoring('Unknown')
 
 
@@ -60,7 +59,7 @@ def test_tfid_scoring():
 
     keywordsChief = KeywordsChief()
     keywords = keywordsChief.extract_keywords(["python", "functional-programming"])
-    with pytest.raises(NotImplementedError) as e:
+    with pytest.raises(NotImplementedError):
         s.score(keywordsChief, keywords)
 
 

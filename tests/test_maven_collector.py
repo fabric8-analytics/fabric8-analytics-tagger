@@ -22,10 +22,10 @@ def test_execute_method():
     maven_index_checker_jar = path.join(filedir, "maven-index-checker.jar")
     try:
         remove(maven_index_checker_jar)
-    except FileNotFoundError as e:
+    except FileNotFoundError:
         pass
 
-    with pytest.raises(InstallPrepareError) as e:
+    with pytest.raises(InstallPrepareError):
         c.execute()
 
 

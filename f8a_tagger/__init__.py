@@ -21,6 +21,20 @@ from .recipes import lookup_text
 from .recipes import reckon
 from .tokenizer import Tokenizer
 
+assert Corpus
+assert RemoteDependencyMissingError
+assert KeywordsChief
+assert aggregate
+assert collect
+assert get_registered_collectors
+assert get_registered_scorers
+assert get_registered_stemmers
+assert lookup_file
+assert lookup_readme
+assert lookup_text
+assert reckon
+assert Tokenizer
+
 
 def prepare():
     """Prepare tagger for run.

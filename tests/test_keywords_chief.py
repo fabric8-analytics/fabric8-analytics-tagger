@@ -27,8 +27,9 @@ def test_custom_keyword_file_loading():
 
 def test_non_existing_keyword_file_loading():
     """Test if non-existing keyword file is properly reported."""
-    with pytest.raises(FileNotFoundError) as e:
+    with pytest.raises(FileNotFoundError):
         keywordsChief = KeywordsChief("test_data/non_existing_file.yaml")
+        print(keywordsChief)
 
 
 def test_keyword_file_check():
@@ -46,8 +47,9 @@ def test_keyword_file_check():
     # most other types are not accepted
     inputs = [True, False, 42, 1.5, [], {}]
     for keyword_file in inputs:
-        with pytest.raises(f8a_tagger.errors.InvalidInputError) as e:
+        with pytest.raises(f8a_tagger.errors.InvalidInputError):
             keywordsChief3 = KeywordsChief(keyword_file)
+            print(keywordsChief3)
 
 
 def test_keyword_loading_from_bytestream():

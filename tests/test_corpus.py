@@ -83,7 +83,7 @@ def test_load_json_method():
     assert ["test"] in c2._entries
     assert ["foo", "bar"] in c2._entries
 
-    with pytest.raises(TypeError) as e:
+    with pytest.raises(TypeError):
         Corpus.load_json(None)
 
 

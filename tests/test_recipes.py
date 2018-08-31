@@ -1,7 +1,7 @@
 """Tests for functions from recipes module."""
 
 import pytest
-from unittest.mock import *
+from unittest.mock import patch
 from f8a_tagger.errors import InvalidInputError
 import f8a_tagger.recipes
 
@@ -37,65 +37,72 @@ def test_reckon():
 
 
 @patch('f8a_tagger.tokenizer.Tokenizer.tokenize', return_value=["token1", "token2", "token3"])
-def test_lookup_text(mocked_function):
+def test_lookup_text(_mocked_function):
     """Test for the function lookup_text()."""
     score = f8a_tagger.recipes.lookup_text("Hello world")
     assert not score
 
     # test the check in the function
-    with pytest.raises(InvalidInputError) as e:
+    with pytest.raises(InvalidInputError):
         f8a_tagger.recipes.lookup_text(None)
 
 
 @patch('f8a_tagger.tokenizer.Tokenizer.tokenize', return_value=["token1", "token2", "token3"])
-def test_lookup_file(mocked_function):
+def test_lookup_file(_mocked_function):
     """Test for the function lookup_file()."""
     result = f8a_tagger.recipes.lookup_file("test_data/README_rst.json", ignore_errors=True)
+    assert result is not None
+
     result = f8a_tagger.recipes.lookup_file("test_data/README_rst.json")
+    assert result is not None
 
     with pytest.raises(ValueError):
         result = f8a_tagger.recipes.lookup_file("test_data/")
+        assert result is not None
 
     # check the logging error part
     result = f8a_tagger.recipes.lookup_file("test_data/", ignore_errors=True)
+    assert result is not None
 
     # check the logging error part
     result = f8a_tagger.recipes.lookup_file("http://google.com", ignore_errors=True)
+    assert result is not None
 
 
 @patch('f8a_tagger.tokenizer.Tokenizer.tokenize', return_value=["token1", "token2", "token3"])
-def test_lookup_readme_proper_input(mocked_function):
+def test_lookup_readme_proper_input(_mocked_function):
     """Test for the function lookup_readme()."""
     payload = {
         "type": "reStructuredText",
         "content": "Hello world!"
     }
     results = f8a_tagger.recipes.lookup_readme(payload)
+    assert results is not None
 
 
 def test_lookup_readme_wrong_input():
     """Test for the function lookup_readme()."""
-    with pytest.raises(InvalidInputError) as e:
+    with pytest.raises(InvalidInputError):
         f8a_tagger.recipes.lookup_readme(None)
 
     # empty dictionary
     payload = {
     }
-    with pytest.raises(InvalidInputError) as e:
+    with pytest.raises(InvalidInputError):
         f8a_tagger.recipes.lookup_readme(payload)
 
     # missing 'content' attribute
     payload = {
         "type": "reStructuredText"
     }
-    with pytest.raises(InvalidInputError) as e:
+    with pytest.raises(InvalidInputError):
         f8a_tagger.recipes.lookup_readme(payload)
 
     # missing 'type' attribute
     payload = {
         "content": "Hello world!"
     }
-    with pytest.raises(InvalidInputError) as e:
+    with pytest.raises(InvalidInputError):
         f8a_tagger.recipes.lookup_readme(payload)
 
 
@@ -115,7 +122,7 @@ def test_prepare_lookup():
 
 
 @patch('f8a_tagger.tokenizer.Tokenizer.tokenize', return_value=["token1", "token2", "token3"])
-def test_perform_lookup(mocked_function):
+def test_perform_lookup(_mocked_function):
     """Test for the function _perform_lookup()."""
     ngram_size, tokenizer, chief, parser = f8a_tagger.recipes._prepare_lookup(
         keywords_file="test_data/keywords.yaml")
@@ -153,7 +160,7 @@ def test_aggregate():
 
 def test_collect():
     """Test for the function collect()."""
-    with pytest.raises(Exception) as e:
+    with pytest.raises(Exception):
         f8a_tagger.recipes.collect()
 
 

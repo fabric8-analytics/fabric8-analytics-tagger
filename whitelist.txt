@@ -1,0 +1,2 @@
+"""Whitelist to be used by Vulture."""
+
