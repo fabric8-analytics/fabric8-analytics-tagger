@@ -46,8 +46,9 @@ def test_execute_method_negative1(_mocked_get):
     """Test the execute() method."""
     c = StackOverflowCollector()
 
-    with pytest.raises(RuntimeError) as e:
+    with pytest.raises(RuntimeError):
         keywords = c.execute()
+        print(keywords)
 
 
 mocked_add_called = False

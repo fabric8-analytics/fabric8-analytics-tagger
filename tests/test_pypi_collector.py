@@ -45,6 +45,7 @@ def ___test_original_execute_method():
     c = PypiCollector()
 
     keywords = c.execute()
+    assert keywords is not None
 
 
 @patch("f8a_tagger.collectors.pypi.requests.get", side_effect=mocked_requests_get)
@@ -53,6 +54,7 @@ def test_execute_method(_mocked_requests_get_obj):
     c = PypiCollector()
 
     keywords = c.execute()
+    assert keywords is not None
 
 
 def mocked_requests_get_2(url):
@@ -64,9 +66,11 @@ def mocked_requests_get_2(url):
 def test_execute_method_negative(_mocked_requests_get_obj):
     """Test the execute() method."""
     c = PypiCollector()
+    assert c is not None
 
-    with pytest.raises(RuntimeError) as e:
+    with pytest.raises(RuntimeError):
         keywords = c.execute()
+        assert keywords is not None
 
 
 def mocked_requests_get_3(url):
@@ -88,10 +92,12 @@ def test_execute_method_negative2(_mocked_requests_get_obj):
     """Test the execute() method."""
     c = PypiCollector()
 
-    with pytest.raises(RuntimeError) as e:
+    with pytest.raises(RuntimeError):
         keywords = c.execute(ignore_errors=False)
+        assert keywords is not None
 
     keywords = c.execute(ignore_errors=True)
+    assert keywords is not None
 
 
 if __name__ == '__main__':

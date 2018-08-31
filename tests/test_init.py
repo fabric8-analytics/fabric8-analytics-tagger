@@ -28,7 +28,7 @@ def mocked_requests_get(url):
 @patch("requests.get", side_effect=mocked_requests_get)
 def test_prepare_negative(_mocked_requests_get_obj):
     """Test the execute() method."""
-    with pytest.raises(RemoteDependencyMissingError) as e:
+    with pytest.raises(RemoteDependencyMissingError):
         prepare()
 
 

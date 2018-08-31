@@ -31,7 +31,7 @@ def test_stopwords_reading():
         tokenizer = Tokenizer(fin, None)
         assert tokenizer
 
-    with pytest.raises(InvalidInputError) as e:
+    with pytest.raises(InvalidInputError):
         tokenizer = Tokenizer({}, None)
 
 
@@ -240,7 +240,7 @@ def test_tokenize_error_handling(_mock):
     content = "The prerequisite for tagging is to collect keywords that are used " + \
               "out there by developers.This also means that tagger uses keywords " + \
               "that are considered as interesting ones by developers."
-    with pytest.raises(InstallPrepareError) as e:
+    with pytest.raises(InstallPrepareError):
         tokenizer.tokenize(content)
 
 

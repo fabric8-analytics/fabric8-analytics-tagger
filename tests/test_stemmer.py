@@ -22,12 +22,15 @@ def test_get_stemmer_negative():
     """Test for the method get_stemmer()."""
     with pytest.raises(StemmerNotFoundError):
         stemmer = Stemmer.get_stemmer("unknown")
+        print(stemmer)
 
     with pytest.raises(StemmerNotFoundError):
         stemmer = Stemmer.get_stemmer("")
+        print(stemmer)
 
     with pytest.raises(StemmerNotFoundError):
         stemmer = Stemmer.get_stemmer(None)
+        print(stemmer)
 
 
 def test_get_registered_stemmers():

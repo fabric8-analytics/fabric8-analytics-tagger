@@ -24,15 +24,15 @@ def test_iter_files():
 
 def test_iter_files_negative():
     """Check the iter_files iterator."""
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(ValueError):
         x = list(iter_files("wrong_path", ignore_errors=False))
         assert len(x) > 0
 
-    with pytest.raises(RuntimeError) as e:
+    with pytest.raises(RuntimeError):
         x = list(iter_files("http://foobar.baz.nonexistent", ignore_errors=False))
         assert len(x) > 0
 
-    with pytest.raises(RuntimeError) as e:
+    with pytest.raises(RuntimeError):
         x = list(iter_files("http://google.com/X", ignore_errors=False))
         assert len(x) > 0
 

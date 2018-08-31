@@ -15,7 +15,7 @@ def test_execute_method():
     c = NpmCollector()
 
     # this collector is not fully implemented yet
-    with pytest.raises(NotImplementedError) as e:
+    with pytest.raises(NotImplementedError):
         c.execute()
 
 

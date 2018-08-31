@@ -7,6 +7,7 @@ from f8a_tagger.parsers.core_parser import CoreParser
 def test_initial_state():
     """Check the initial state of CoreParser."""
     c = CoreParser()
+    assert c is not None
 
 
 def test_parse_method():
@@ -22,11 +23,11 @@ def test_parse_method():
     assert parsed == "two divs"
 
     # wrong content-type checking
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(ValueError):
         c.parse("content", "unknown-content-type")
 
     # wrong content checking
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(ValueError):
         c.parse("", "txt")
 
 
@@ -46,11 +47,13 @@ def test_parse_file_method_negative():
     c = CoreParser()
 
     # Asciidoc parser is not implemented yet
-    with pytest.raises(NotImplementedError) as e:
+    with pytest.raises(NotImplementedError):
         parsed = c.parse_file("test_data/README.asciidoc")
+        print(parsed)
 
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(ValueError):
         parsed = c.parse_file("test_data/keywords.yaml")
+        print(parsed)
 
 
 def test_parse_file_method_json_fallback():
@@ -79,20 +82,25 @@ def test_parse_readme_json_method_negative():
     """Check the method parse_readme_json() for wrong input."""
     c = CoreParser()
 
-    with pytest.raises(TypeError) as e:
+    with pytest.raises(TypeError):
         parsed = c.parse_readme_json(None)
+        print(parsed)
 
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(ValueError):
         parsed = c.parse_readme_json("test_data/README_empty.json")
+        print(parsed)
 
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(ValueError):
         parsed = c.parse_readme_json("test_data/README_null.json")
+        print(parsed)
 
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(ValueError):
         parsed = c.parse_readme_json("test_data/README_broken_no_content.json")
+        print(parsed)
 
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(ValueError):
         parsed = c.parse_readme_json("test_data/README_broken_no_type.json")
+        print(parsed)
 
 
 if __name__ == '__main__':
