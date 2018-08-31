@@ -8,7 +8,7 @@ class AbstractParser(metaclass=abc.ABCMeta):  # pylint: disable=too-few-public-m
     """Abstract markup parser for fabric8-analytics."""
 
     @abc.abstractmethod
-    def parse(self, content):
+    def parse(self, _content):
         """Parse content to raw text.
 
         :param content: content to parse
