@@ -9,6 +9,8 @@ class NpmCollector(CollectorBase):
 
     def execute(self, ignore_errors=True, use_progressbar=False):
         """Collect NPM keywords."""
+        assert ignore_errors is not None
+        assert use_progressbar is not None
         raise NotImplementedError()
 
 
