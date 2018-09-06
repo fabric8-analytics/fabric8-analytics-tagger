@@ -20,6 +20,8 @@ class StackOverflowCollector(CollectorBase):
 
     def execute(self, ignore_errors=True, use_progressbar=False):
         """Collect PyPI keywords."""
+        assert ignore_errors is not None
+        assert use_progressbar is not None
         keywords_set = KeywordsSet()
         _logger.debug("Fetching StackOverflow")
 

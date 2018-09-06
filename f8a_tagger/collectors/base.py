@@ -18,6 +18,8 @@ class CollectorBase(metaclass=abc.ABCMeta):
         :return: keywords set
         :rtype: f8a_tagger.keywords_set.KeywordsSet
         """
+        assert ignore_errors is not None
+        assert use_progressbar is not None
         pass
 
     @classmethod
