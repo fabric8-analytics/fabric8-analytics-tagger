@@ -53,4 +53,8 @@ echo "*** Unit tests ***"
 echo "*****************************************"
 cd tests || exit
 PYTHONDONTWRITEBYTECODE=1 python3 "$(which pytest)" --cov=../f8a_tagger/ --cov-report term-missing --cov-report xml --cov-fail-under=$COVERAGE_THRESHOLD -vv .
+
+cp -r ../.git ./
+codecov --token=f6b4baf8-a75f-4185-b255-d26ff1a47e8c --root=../
+
 printf "%stests passed%s\n\n" "${GREEN}" "${NORMAL}"
