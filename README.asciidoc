@@ -100,7 +100,7 @@ The `lookup` command does the whole heavy computation needed for keywords extrac
 
 The overall high-level overview of the `lookup` command can be described in the following steps:
 
-1. The first step is to do pre-processing of input files. Input files can be written in different formats. Except plaintext, there can be also used text files using different markup formats (such as Markdown, ASCIIdoc, and such).
+1. The first step is to do pre-processing of input files. Input files can be written in different formats. Except plaintext, there can be also used text files using different markup formats (such as Markdown, AsciiDoc, and such).
 
 2. After input pre-processing there is available plaintext without any markup formatting parts. This text is after that split into sentences. The actual split is done in a smart way (so "This Mr. Baron e.g. Mr. Foo." will be one sentence - not just split on dots).
 
@@ -108,7 +108,7 @@ The overall high-level overview of the `lookup` command can be described in the 
 
 4. link:https://en.wikipedia.org/wiki/Lemmatisation[Lemmatization] - all words (tokens) are replaced with their representative as words appear in several inflected forms. Lemmatization uses NLTK's WordNet corpus (large lexical database of English words).
 
-5. After lemmatization there is performed link:https://en.wikipedia.org/wiki/Stemming[stemming]. Stemming ensures that different words are mapped to their word stem (e.g. "licencing", "license" is same). There are available different stemmers, check `lookup --help` for listing of all available ones. Check out link:https://nlp.stanford.edu/IR-book/html/htmledition/stemming-and-lemmatization-1.html[Standford's NLP] for more insights on lemmatization and stemming.
+5. After lemmatization there is performed link:https://en.wikipedia.org/wiki/Stemming[stemming]. Stemming ensures that different words are mapped to their word stem (e.g. "licensing", "license" is same). There are available different stemmers, check `lookup --help` for listing of all available ones. Check out link:https://nlp.stanford.edu/IR-book/html/htmledition/stemming-and-lemmatization-1.html[Standford's NLP] for more insights on lemmatization and stemming.
 
 6. Unwanted tokens are removed - tokens are checked against stopwords file and if there is a match, unwanted tokens are removed. This step ensures that the lookup will perform faster and we also remove obviously wrong words that shouldn't be marked as keywords (words with high entropy).
 
@@ -319,7 +319,7 @@ Please note that only semantical problems are reported.
 
 == Check for scripts written in BASH
 
-The script named `check-bashscripts.sh` can be used to check all BASH scripts (in fact: all files with the `.sh` extension) for various possible issues, incompatibilies, and caveats. This script can be run w/o any arguments:
+The script named `check-bashscripts.sh` can be used to check all BASH scripts (in fact: all files with the `.sh` extension) for various possible issues, incompatibilities, and caveats. This script can be run w/o any arguments:
 
 ----
 ./check-bashscripts.sh
