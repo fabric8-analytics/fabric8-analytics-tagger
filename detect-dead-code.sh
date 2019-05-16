@@ -1,6 +1,6 @@
 #!/bin/bash
 
-directories="f8a_tagger tests"
+directories="f8a_tagger tests tools"
 separate_files="f8a_tagger_cli.py setup.py"
 
 pass=0
