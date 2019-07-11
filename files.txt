@@ -1,0 +1,2 @@
+f8a_tagger_cli.py
+setup.py
