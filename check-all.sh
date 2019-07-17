@@ -75,7 +75,7 @@ run_all_checkers() {
 
     echo "  Unit tests for this project"
     run_checker runtests
-    check_results $? runtest
+    check_results $? runtests
 
     printf "%sDone%s\n\n" "${YELLOW}" "${NORMAL}"
 }
