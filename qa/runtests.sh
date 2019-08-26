@@ -47,6 +47,9 @@ check_python_version
 
 [ "$NOVENV" == "1" ] || prepare_venv || exit 1
 
+# this script is copied by CI, we don't need it
+rm -f env-toolkit
+
 echo "*****************************************"
 echo "*** Cyclomatic complexity measurement ***"
 echo "*****************************************"
