@@ -32,7 +32,7 @@ function check_files() {
     for source in $1
     do
         echo "$source"
-        vulture --min-confidence 90 "$source" whitelist.txt
+        vulture --min-confidence 90 "$source" "${SCRIPT_DIR}/whitelist.txt"
         if [ $? -eq 0 ]
         then
             echo "    Pass"
