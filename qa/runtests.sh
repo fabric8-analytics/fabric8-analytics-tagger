@@ -1,6 +1,9 @@
 #! /bin/bash
 
-# each command can cause test failure
+SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
+
+pushd "${SCRIPT_DIR}/.." > /dev/null
+
 set -e
 
 COVERAGE_THRESHOLD=90
@@ -64,3 +67,4 @@ cp -r ../.git ./
 codecov --token=f6b4baf8-a75f-4185-b255-d26ff1a47e8c --root=../
 
 printf "%stests passed%s\n\n" "${GREEN}" "${NORMAL}"
+popd > /dev/null

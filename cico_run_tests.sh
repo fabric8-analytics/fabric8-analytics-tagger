@@ -10,4 +10,4 @@ prep() {
 }
 
 prep
-./runtests.sh
+./qa/runtests.sh
