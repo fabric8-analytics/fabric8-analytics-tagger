@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Suggest an enhancement for Svitava
+about: Suggest an enhancement for this project
 title: ''
 labels: enhancement
 
