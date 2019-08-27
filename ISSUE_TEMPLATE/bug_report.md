@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a report to help us improve Svitava
+about: Create a report to help us improve this project
 title: ''
 labels: ''
 
@@ -26,7 +26,7 @@ A clear and concise description of what you expected to happen.
 If applicable, copy/paste the text or add screenshots to help explain your problem.
 
 **Environment (please complete the following information):**
- - Svitava version [e.g. 1.0.0] (Or paste the result of `svitava --version`.)
+ - Project version [e.g. 1.0.0]
  - OS: [e.g. Ubuntu 18.04, Windows 10 1809, macOS 10.14]
  - Terminal: [e.g. GNOME Terminal, mintty, iTerm2, tmux, GNU screen]
 
