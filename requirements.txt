@@ -19,7 +19,7 @@ json5==0.2.4              # via anymarkup
 libarchive-c==2.7
 lxml==3.8.0
 markdown2==2.3.4
-nltk==3.2.4
+nltk==3.4.5
 progressbar2==3.34.2
 pygments==2.2.0
 python-utils==2.2.0       # via progressbar2
