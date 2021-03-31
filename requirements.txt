@@ -4,29 +4,57 @@
 #
 #    pip-compile --output-file requirements.txt requirements.in
 #
-anymarkup-core==0.7.1     # via anymarkup
+anymarkup-core==0.7.1
+    # via anymarkup
 anymarkup==0.7.0
-beautifulsoup4==4.6.0     # via bs4
+    # via -r requirements.in
+beautifulsoup4==4.6.0
+    # via bs4
 bs4==0.0.1
-certifi==2017.7.27.1      # via requests
-chardet==3.0.4            # via requests
+    # via -r requirements.in
+certifi==2017.7.27.1
+    # via requests
+chardet==3.0.4
+    # via requests
 click==6.7
-configobj==5.0.6          # via anymarkup
+    # via -r requirements.in
+configobj==5.0.6
+    # via anymarkup
 daiquiri==1.2.2
+    # via -r requirements.in
 docutils==0.14
-idna==2.6                 # via requests
-json5==0.2.4              # via anymarkup
+    # via -r requirements.in
+idna==2.6
+    # via requests
+json5==0.2.4
+    # via anymarkup
 libarchive-c==2.7
-lxml==3.8.0
+    # via -r requirements.in
+lxml==4.6.3
+    # via -r requirements.in
 markdown2==2.3.4
+    # via -r requirements.in
 nltk==3.4.5
+    # via -r requirements.in
 progressbar2==3.34.2
+    # via -r requirements.in
 pygments==2.2.0
-python-utils==2.2.0       # via progressbar2
-pyyaml==3.12              # via anymarkup
+    # via -r requirements.in
+python-utils==2.2.0
+    # via progressbar2
+pyyaml==3.12
+    # via anymarkup
 requests==2.18.4
+    # via -r requirements.in
 simplejson==3.11.1
-six==1.10.0               # via anymarkup-core, configobj, nltk, python-utils
-toml==0.9.2               # via anymarkup
-urllib3==1.22             # via requests
+    # via -r requirements.in
+six==1.10.0
+    # via nltk
+toml==0.9.2
+    # via anymarkup
+urllib3==1.22
+    # via requests
 xmltodict==0.11.0
+    # via
+    #   -r requirements.in
+    #   anymarkup
