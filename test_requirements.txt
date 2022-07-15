@@ -1,4 +1,4 @@
 pytest
 pytest-cov
-codecov==2.0.15
+codecov==2.0.16
 radon==3.0.1
